@@ -4,9 +4,24 @@ import sys
 import re
 
 
-rgx_YT_video: re = r'https://youtu.be/[A-Za-z0-9-_]{11}(?:/)?$'
-rgx_YT_short_with_share: re = r'https://www.youtube.com/shorts/[A-Za-z0-9-_]{11}\?feature=share(?:/)?$'
-rgx_YT_short_without_share: re = r'https://www.youtube.com/shorts/[A-Za-z0-9-_]{11}(?:/)?$'
+
+rgx_video_id: re = r'[A-Za-z0-9-_]{11}'
+rgx_playlist_id: re = r'[A-Za-z0-9-_]{34}'
+rg_end_of_url: re = r'[\/\?]?$'
+
+
+rgx_YT_video: re = r'^https://youtu.be/[A-Za-z0-9-_]{11}(?:/)?$'#
+rgx_YT_video_at_current_time: re = r'^https://youtu.be/[A-Za-z0-9-_]{11}?t=[0-9]+[\/\?]?$'
+rgx_YT_watch_video: re = r'^https://youtu.be/watch\?v=[A-Za-z0-9-_]{11}[\/\?]?$'
+
+rgx_YT_video_from_playlist: re = r'^https://youtu.be/[A-Za-z0-9-_]{11}\?list=[A-Za-z0-9-_]{34}[\/\?]?$'
+rgx_YT_watch_video_from_playlist: re = r'^https://www.youtube.com/watch\?v=[A-Za-z0-9-_]{11}\?list=[A-Za-z0-9-_]{34}[\/\?]?$'
+rgx_YT_video_from_playlist_at_current_time: re = r'^https://youtu.be/[A-Za-z0-9-_]{11}\?list=[A-Za-z0-9-_]{34}&t=[0-9]+[\/\?]?$'
+
+rgx_YT_short: re = r'^https://www.youtube.com/shorts/[A-Za-z0-9-_]{11}[\/\?]?$'
+rgx_YT_short_with_share: re = r'^https://www.youtube.com/shorts/[A-Za-z0-9-_]{11}\?feature=share[\/\?]?$'
+rgx_YT_short_with_current_time: re = r'^https://www.youtube.com/shorts/[A-Za-z0-9-_]{11}\?t=[0-10]+[\/\?]?$'
+rgx_YT_short_with_current_time_and_with_share: re = r'^https://www.youtube.com/shorts/[A-Za-z0-9-_]{11}\?t=[0-10]+&feature=share[\/\?]?$'
 
 
 def get_id_of_youtube_url(url: str) -> str:
@@ -23,8 +38,7 @@ def get_id_of_youtube_url(url: str) -> str:
 
 
     if re.match(rgx_YT_video, url) is not None or re.match(rgx_YT_short_without_share, url) is not None:
-        return url.split('/')[-2] if url.endswith('/') else  url.split('/')[-1]
-       
+        return url.split('/')[-2] if url.endswith('/') else url.split('/')[-1]
     elif re.match(rgx_YT_short_with_share, url) is not None:
         return url.replace("?feature=share", "").split("/")[-1]
     else:
@@ -34,7 +48,7 @@ def get_id_of_youtube_url(url: str) -> str:
 
 
 def get_youtube_thumbnail(VIDEO_ID: str) -> str:
-    """
+    """z
     For URL 'https://www.youtube.com/shorts/Nl9pcj79byY?feature=share'
     The VIDEO_ID is 'Nl9pcj79byY'
     THUMBNAIL looks like 'https://img.youtube.com/vi/Nl9pcj79byY/hqdefault.jpg'

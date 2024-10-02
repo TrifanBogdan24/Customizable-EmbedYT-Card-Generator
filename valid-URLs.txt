@@ -1,0 +1,58 @@
+# 1 - YouTube Video (Copy vidoe URL address)
+https://youtu.be/WRsKs-K6iII
+https://youtu.be/WRsKs-K6iII?
+https://youtu.be/WRsKs-K6iII/
+
+
+# 2- YouTube Video (Copy video URL at curent time)
+https://youtu.be/WRsKs-K6iII?t=56
+https://youtu.be/WRsKs-K6iII?t=56?
+https://youtu.be/WRsKs-K6iII?t=56/
+
+
+# 3 - YouTube Video (from the URL bar)
+https://www.youtube.com/watch?v=WRsKs-K6iII
+https://www.youtube.com/watch?v=WRsKs-K6iII?
+https://www.youtube.com/watch?v=WRsKs-K6iII/
+
+
+# 4 - YouTube Video (can be inserted in the URL bar)
+https://www.youtube.com/watch?v=WRsKs-K6iII&t=56s
+https://www.youtube.com/watch?v=WRsKs-K6iII&t=56s?
+https://www.youtube.com/watch?v=WRsKs-K6iII&t=56s/
+
+
+# 5 - YouTube Video From Playlist (from URL bar)
+https://www.youtube.com/watch?v=DwUbcsjp_RI&list=PLTEsfOte9N3jRJbmEXz67pJ5qhq5CeCdL
+https://www.youtube.com/watch?v=DwUbcsjp_RI&list=PLTEsfOte9N3jRJbmEXz67pJ5qhq5CeCdL?
+https://www.youtube.com/watch?v=DwUbcsjp_RI&list=PLTEsfOte9N3jRJbmEXz67pJ5qhq5CeCdL/
+
+
+# 6 - YouTube Video From Playlist (Copy video URL)
+https://youtu.be/DwUbcsjp_RI?list=PLTEsfOte9N3jRJbmEXz67pJ5qhq5CeCdL
+https://youtu.be/DwUbcsjp_RI?list=PLTEsfOte9N3jRJbmEXz67pJ5qhq5CeCdL?
+https://youtu.be/DwUbcsjp_RI?list=PLTEsfOte9N3jRJbmEXz67pJ5qhq5CeCdL/
+
+
+# 7 - YouTube Video From Playlist (Copy video URL at current time)
+https://youtu.be/DwUbcsjp_RI?list=PLTEsfOte9N3jRJbmEXz67pJ5qhq5CeCdL&t=1
+https://youtu.be/DwUbcsjp_RI?list=PLTEsfOte9N3jRJbmEXz67pJ5qhq5CeCdL&t=1?
+https://youtu.be/DwUbcsjp_RI?list=PLTEsfOte9N3jRJbmEXz67pJ5qhq5CeCdL&t=1/
+
+
+# 8 - YouTube Short (from the URL bar)
+https://www.youtube.com/shorts/rdDY5VNDLsg
+https://www.youtube.com/shorts/rdDY5VNDLsg/
+https://www.youtube.com/shorts/rdDY5VNDLsg?
+
+
+# 9 - YouTube Short (Copy video URL)
+https://www.youtube.com/shorts/rdDY5VNDLsg?feature=share
+https://www.youtube.com/shorts/rdDY5VNDLsg?feature=share/
+https://www.youtube.com/shorts/rdDY5VNDLsg?feature=share?
+
+
+# 10 - YouTube Short (Copy video URL at current time)
+https://www.youtube.com/shorts/rdDY5VNDLsg?t=14&feature=share
+https://www.youtube.com/shorts/rdDY5VNDLsg?t=14&feature=share/
+https://www.youtube.com/shorts/rdDY5VNDLsg?t=14&feature=share?

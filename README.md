@@ -23,6 +23,10 @@ The user can also choose the text alingment.
 
 
 
+
+
+
+
 # Dependencies
 ---
 

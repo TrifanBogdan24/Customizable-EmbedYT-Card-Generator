@@ -1,2 +1,2 @@
 #!/bin/bash
-sudo rm /usr/local/bin/html_md_youtube_card
+sudo rm -i /usr/local/bin/html_md_youtube_card
