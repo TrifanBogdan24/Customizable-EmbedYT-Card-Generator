@@ -301,7 +301,7 @@ def help_option():
     print(f"\tthe HTML code for a clickable YouTube card will be generated.")
     print()
     print(f"\tThe clickable card can also contain the title of the YouTube Video/Short.")
-    print(f"\tAnd the use can choose which one to be displayed first, the URL or the TITLE.")
+    print(f"\tAnd the user can choose which one to be displayed first, the URL or the TITLE.")
     print(f"\tThe user can also choose the text alingment.")
     print()
     print("USAGE:")
