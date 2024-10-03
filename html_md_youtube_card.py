@@ -52,6 +52,25 @@ def get_id_of_youtube_url(url: str) -> str:
     If the URL is a valid YouTube link, the VIDEO_ID will be returned.
     Otherwise, it returns an empty string.
     """
+
+
+    try:
+        if requests.get("https://google.com").ok is True and requests.get("https://www.youtube.com/").ok is True and requests.get(url).ok is False:
+            print(f"ERR: {url} is not available online!", file=sys.stderr)
+            print(f"Do you want to continue anyway? y/N", end = ' ')
+            while True:
+                user_input = input().strip().lower()
+                if user_input in ['y', 'yes']:
+                    break
+                elif user_input in ['n', 'no']:
+                    sys.exit(1)
+                else:
+                    print(f"ERR: Unrecognize response! Please type 'y' for YES and 'n' for NO!", file=sys.stderr)
+    except:
+        pass
+
+
+
     global rgx_01_YT_video
     global rgx_02_YT_video_at_current_time
     global rgx_03_YT_watch_video
@@ -218,7 +237,7 @@ def get_youtube_thumbnail(VIDEO_ID: str) -> str:
                 elif user_input in ['n', 'no']:
                     sys.exit(1)
                 else:
-                    print("Unrecognize responsed! Please type 'y' for YES and 'n' for NO")
+                    print(f"ERR: Unrecognize response! Please type 'y' for YES and 'n' for NO!", file=sys.stderr)
     else:
         # No internet, therefore the first thumbnail URL will be returend
         return thumbnail_1
@@ -449,7 +468,7 @@ def interactive_mode() -> None:
     while True:
         user_input = input().strip().lower()
         if user_input not in ['y', 'yes', 'n', 'no']:
-            print("Unrecognize responsed! Please type 'y' for YES and 'n' for NO")
+            print(f"ERR: Unrecognize response! Please type 'y' for YES and 'n' for NO", file=sys.stderr)
         else:
             INLCUDE_TITLE = True if user_input in ['y', 'yes'] else False
             break
