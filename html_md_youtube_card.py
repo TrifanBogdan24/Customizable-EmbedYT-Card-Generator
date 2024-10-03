@@ -610,7 +610,7 @@ def help_option():
 
 
 def main():
-
+    # TODO: implement the `-e`, `--exists-online` flag (only by specifying this flag, online requests are made)
     if len(sys.argv) == 2 and sys.argv[1] in ['-i', '--interactive']:
         # exe -i
         interactive_mode()
