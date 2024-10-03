@@ -10,18 +10,35 @@ rgx_playlist_id: re = r'[A-Za-z0-9-_]{34}'
 rg_end_of_url: re = r'[\/\?]?$'
 
 
-rgx_YT_video: re = r'^https://youtu.be/[A-Za-z0-9-_]{11}(?:/)?$'#
-rgx_YT_video_at_current_time: re = r'^https://youtu.be/[A-Za-z0-9-_]{11}?t=[0-9]+[\/\?]?$'
-rgx_YT_watch_video: re = r'^https://youtu.be/watch\?v=[A-Za-z0-9-_]{11}[\/\?]?$'
 
-rgx_YT_video_from_playlist: re = r'^https://youtu.be/[A-Za-z0-9-_]{11}\?list=[A-Za-z0-9-_]{34}[\/\?]?$'
-rgx_YT_watch_video_from_playlist: re = r'^https://www.youtube.com/watch\?v=[A-Za-z0-9-_]{11}\?list=[A-Za-z0-9-_]{34}[\/\?]?$'
-rgx_YT_video_from_playlist_at_current_time: re = r'^https://youtu.be/[A-Za-z0-9-_]{11}\?list=[A-Za-z0-9-_]{34}&t=[0-9]+[\/\?]?$'
+# For 'manually' getting the VIDEO ID
 
-rgx_YT_short: re = r'^https://www.youtube.com/shorts/[A-Za-z0-9-_]{11}[\/\?]?$'
-rgx_YT_short_with_share: re = r'^https://www.youtube.com/shorts/[A-Za-z0-9-_]{11}\?feature=share[\/\?]?$'
-rgx_YT_short_with_current_time: re = r'^https://www.youtube.com/shorts/[A-Za-z0-9-_]{11}\?t=[0-10]+[\/\?]?$'
-rgx_YT_short_with_current_time_and_with_share: re = r'^https://www.youtube.com/shorts/[A-Za-z0-9-_]{11}\?t=[0-10]+&feature=share[\/\?]?$'
+rgx_01_YT_video: re = r'^https://youtu.be/[A-Za-z0-9-_]{11}[\/\?]?$'
+rgx_02_YT_video_at_current_time: re = r'^https://youtu.be/[A-Za-z0-9-_]{11}\?t=[0-9]+[\/\?]?$'
+rgx_03_YT_watch_video: re = r'^https://youtu.be/watch\?v=[A-Za-z0-9-_]{11}[\/\?]?$'
+rgx_04_YT_watch_video_at_current_time:re = r'^https://youtu.be/watch\?v=[A-Za-z0-9-_]{11}\?t=[0-9]+[\/\?]?$'
+
+rgx_05_YT_video_from_playlist: re = r'^https://youtu.be/[A-Za-z0-9-_]{11}\?list=[A-Za-z0-9-_]{34}[\/\?]?$'
+rgx_06_YT_video_from_playlist_at_current_time: re = r'^https://youtu.be/[A-Za-z0-9-_]{11}\?list=[A-Za-z0-9-_]{34}&t=[0-9]+[\/\?]?$'
+rgx_07_YT_watch_video_from_playlist: re = r'^https://www.youtube.com/watch\?v=[A-Za-z0-9-_]{11}[\?\&]list=[A-Za-z0-9-_]{34}[\/\?]?$'
+
+rgx_08_YT_short: re = r'^https://www.youtube.com/shorts/[A-Za-z0-9-_]{11}[\/\?]?$'
+rgx_09_YT_short_with_share: re = r'^https://www.youtube.com/shorts/[A-Za-z0-9-_]{11}\?feature=share[\/\?]?$'
+rgx_10_YT_short_with_current_time: re = r'^https://www.youtube.com/shorts/[A-Za-z0-9-_]{11}\?t=[0-10]+[\/\?]?$'
+rgx_11_YT_short_with_current_time_and_with_share: re = r'^https://www.youtube.com/shorts/[A-Za-z0-9-_]{11}\?t=[0-10]+&feature=share[\/\?]?$'
+
+
+# Define regex patterns for different YouTube URL formats
+# regex from: regex101.com -> Community Patterns -> search youtube url
+full_youtube_regex: re = re.compile(
+    r'^(?:https?://)?(?:www\.)?(?:youtube\.com/(?:[^/]+/.*/|(?:v|e(?:mbed)?|watch|shorts)/|.*[?&]v=)|youtu\.be/)([a-zA-Z0-9_-]{11})'
+)
+
+
+
+
+def is_digit(c: str) -> bool:
+    return c.isdigit()
 
 
 def get_id_of_youtube_url(url: str) -> str:
@@ -32,23 +49,106 @@ def get_id_of_youtube_url(url: str) -> str:
     and if the URL is a valid YouTube link, the VIDEO_ID will be returned.
     Otherwise, it returns an empty string.
     """
-    global rgx_YT_video
-    global rgx_YT_short_with_share
-    global rgx_YT_short_without_share
+    global rgx_01_YT_video
+    global rgx_02_YT_video_at_current_time
+    global rgx_03_YT_watch_video
+    global rgx_04_YT_watch_video_at_current_timere
+    global rgx_05_YT_video_from_playlist
+    global rgx_06_YT_video_from_playlist_at_current_time
+    global rgx_07_YT_watch_video_from_playlist
+    global rgx_08_YT_short
+    global rgx_09_YT_short_with_share
+    global rgx_10_YT_short_with_current_time
+    global rgx_11_YT_short_with_current_time_and_with_share
+    global full_youtube_regex
 
 
-    if re.match(rgx_YT_video, url) is not None or re.match(rgx_YT_short_without_share, url) is not None:
-        return url.split('/')[-2] if url.endswith('/') else url.split('/')[-1]
-    elif re.match(rgx_YT_short_with_share, url) is not None:
-        return url.replace("?feature=share", "").split("/")[-1]
+    if url.endswith('?') or url.endswith('/'):
+        url = url[:-1]
+
+    if re.match(rgx_01_YT_video, url) is not None:
+        video_id: str = url.removeprefix('https://youtu.be/')
+        return video_id
+    
+    elif re.match(rgx_02_YT_video_at_current_time, url) is not None:
+        while not is_digit(url[-1]):
+            url = url[:-1]
+        video_id: str = url.removeprefix('https://youtu.be/')
+        return video_id
+
+    elif re.match(rgx_03_YT_watch_video, url) is not None:
+        video_id: str = url.removeprefix('https://www.youtube.com/watch?v=')
+        return video_id
+
+    elif re.match(rgx_04_YT_watch_video_at_current_time, url) is not None:
+        while not is_digit(url[-1]):
+            url = url[:-1]
+        video_id: str = url.removeprefix('https://www.youtube.com/watch?v=')
+        return video_id
+    
+    elif re.match(rgx_05_YT_video_from_playlist, url) is not None:
+        if url.endswith('?') or url.endswith('/'):
+            url = url[:-1]
+        url = url[:-34]    # Removing the playlist ID (fixed length of 34)
+        url = url[:-len("?list")]
+        video_id: str = url.removeprefix('https://youtu.be/')
+        return video_id
+
+    elif re.match(rgx_06_YT_video_from_playlist_at_current_time, url) is not None:
+        while not is_digit(url[-1]):
+            url = url[:-1]
+        url = url[:-1]    # Removing '&'
+        url = url[:-34]    # Removing the playlist ID (fixed length of 34)
+        url = url[:-len("?list")]
+        video_id: str = url.removeprefix('https://youtu.be/')
+        return video_id
+    
+    elif re.match(rgx_07_YT_watch_video_from_playlist, url) is not None:
+        url = url[:-34]    # Removing the playlist ID (fixed length of 34)
+        url = url[:-len("list")]
+        if url.endswith('?') or url.endswith('&'):
+            url = url[:-1]
+        video_id: str = url.removeprefix('https://www.youtube.com/watch?v=')
+        return video_id
+
+    elif re.match(rgx_08_YT_short, url) is not None:
+        video_id: str = url.removeprefix('https://www.youtube.com/shorts/')
+        return video_id
+
+    elif re.match(rgx_09_YT_short_with_share, url) is not None:
+        url = url.removesuffix('?feature=share')
+        video_id: str = url.removeprefix('https://www.youtube.com/shorts/')
+        return video_id
+    
+    elif re.match(rgx_10_YT_short_with_current_time, url) is not None:
+        while is_digit(url[-1]):
+            url = url[:-1]
+        url = url.removesuffix("?t=")
+        video_id: str = url.removeprefix("https://www.youtube.com/shorts/")
+        return video_id
+
+    elif re.match(rgx_11_YT_short_with_current_time_and_with_share, url) is not None:
+        url = url.removeprefix("&feature=share")
+        while is_digit(url[-1]):
+            url = url[:-1]
+        url = url.removesuffix("?t=")
+        video_id: str = url.removeprefix("https://www.youtube.com/shorts/")
+        return video_id
+
     else:
+        # Use full YouTube Regex (more complicated, but covers more URLs)
+        match = full_youtube_regex.match(url)
+        if match:
+            return match.group(1)  # Return the video ID
+
         print(f"ERR: The provided URL, {url} is not a valid YouTube link!", file = sys.stderr)
+        # Return an empty string if no match found
         return ''
         
 
 
 def get_youtube_thumbnail(VIDEO_ID: str) -> str:
-    """z
+    """
     For URL 'https://www.youtube.com/shorts/Nl9pcj79byY?feature=share'
     The VIDEO_ID is 'Nl9pcj79byY'
     THUMBNAIL looks like 'https://img.youtube.com/vi/Nl9pcj79byY/hqdefault.jpg'
@@ -304,12 +404,30 @@ def help_option():
     print(f"DESCRIPTION:")
     print(f"\t{sys.argv[0]} will match the provided $URL against the following REGEX-s:")
     print()
-    global rgx_YT_video
-    global rgx_YT_short_with_share
-    global rgx_YT_short_without_share
-    print(f"\t-> '{rgx_YT_video}'")
-    print(f"\t-> '{rgx_YT_short_with_share}")
-    print(f"\t-> '{rgx_YT_short_without_share}'")
+    global rgx_01_YT_video
+    global rgx_02_YT_video_at_current_time
+    global rgx_03_YT_watch_video
+    global rgx_04_YT_watch_video_at_current_timere
+    global rgx_05_YT_video_from_playlist
+    global rgx_06_YT_video_from_playlist_at_current_time
+    global rgx_07_YT_watch_video_from_playlist
+    global rgx_08_YT_short
+    global rgx_09_YT_short_with_share
+    global rgx_10_YT_short_with_current_time
+    global rgx_11_YT_short_with_current_time_and_with_share
+    global full_youtube_regex
+    print(f"\t-> '{rgx_01_YT_video}'")
+    print(f"\t-> '{rgx_02_YT_video_at_current_time}'")
+    print(f"\t-> '{rgx_03_YT_watch_video}'")
+    print(f"\t-> '{rgx_04_YT_watch_video_at_current_time}'")
+    print(f"\t-> '{rgx_05_YT_video_from_playlist}'")
+    print(f"\t-> '{rgx_06_YT_video_from_playlist_at_current_time}'")
+    print(f"\t-> '{rgx_07_YT_watch_video_from_playlist}'")
+    print(f"\t-> '{rgx_08_YT_short}'")
+    print(f"\t-> '{rgx_09_YT_short_with_share}'")
+    print(f"\t-> '{rgx_10_YT_short_with_current_time}'")
+    print(f"\t-> '{rgx_11_YT_short_with_current_time_and_with_share}'")
+    print(f"\t-> '{full_youtube_regex}'")
     print()
     print(f"\tIf one of them matches the $URL,")
     print(f"\tthe HTML code for a clickable YouTube card will be generated.")

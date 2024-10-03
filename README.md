@@ -6,9 +6,22 @@ for a **clickable YouTube card**, that can be customized.
 
 It will take a `URL` as input, representing the link to the YouTube Video/Short.
 This `URL` will be matched against the following `REGEX`:
-- `'https://youtu.be/[A-Za-z0-9-_]{11}(?:/)?$'`
-- `'https://www.youtube.com/shorts/[A-Za-z0-9-_]{11}\?feature=share(?:/)?$`
-- `'https://www.youtube.com/shorts/[A-Za-z0-9-_]{11}(?:/)?$'`
+- `^https://youtu.be/[A-Za-z0-9-_]{11}[\/\?]?$'`
+- `^https://youtu.be/[A-Za-z0-9-_]{11}\?t=[0-9]+[\/\?]?$'`
+- `^https://youtu.be/watch\?v=[A-Za-z0-9-_]{11}[\/\?]?$'`
+- `^https://youtu.be/watch\?v=[A-Za-z0-9-_]{11}\?t=[0-9]+[\/\?]?$'`
+- `^https://youtu.be/[A-Za-z0-9-_]{11}\?list=[A-Za-z0-9-_]{34}[\/\?]?$'`
+- `^https://youtu.be/[A-Za-z0-9-_]{11}\?list=[A-Za-z0-9-_]{34}&t=[0-9]+[\/\?]?$'`
+- `^https://www.youtube.com/watch\?v=[A-Za-z0-9-_]{11}[\?\&]list=[A-Za-z0-9-_]{34}[\/\?]?$'`
+- `^https://www.youtube.com/shorts/[A-Za-z0-9-_]{11}[\/\?]?$'`
+- `^https://www.youtube.com/shorts/[A-Za-z0-9-_]{11}\?feature=share[\/\?]?$'`
+- `^https://www.youtube.com/shorts/[A-Za-z0-9-_]{11}\?t=[0-10]+[\/\?]?$'`
+- `^https://www.youtube.com/shorts/[A-Za-z0-9-_]{11}\?t=[0-10]+&feature=share[\/\?]?$'`
+- `re.compile('^(?:https?://)?(?:www\\.)?(?:youtube\\.com/(?:[^/]+/.*/|(?:v|e(?:mbed)?|watch|shorts)/|.*[?&]v=)|youtu\\.be/)([a-zA-Z0-9_-]{11})')'`
+
+
+> Please see the file [valid-URLs.txt](valid-URLs.txt).
+
 
 
 If none of them are matched, the program will exit forcefully.
