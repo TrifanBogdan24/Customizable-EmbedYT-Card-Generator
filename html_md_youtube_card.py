@@ -389,12 +389,25 @@ def command_line_argument_options_mode():
 
     for arg in sys.argv[1:]:
         if arg.startswith('--url='):
+            if URL != '':
+                print(f"ERR: The flag '--url=' has been set before! It cannot appear twice!", file=sys.stderr)
+                print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
+                sys.exit(1)
             URL = arg.removeprefix('--url=')
         
         elif arg.startswith('--title='):
+            if TITLE != '':
+                print(f"ERR: The flag '--title=' has been set before! It cannot appear twice!", file=sys.stderr)
+                print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
+                sys.exit(1)
             TITLE = arg.removeprefix('--title=')
         
         elif arg.startswith('--first='):
+            if FIRST_TO_DISPLAY != '':
+                print(f"ERR: The flag '--first=' has been set before! It cannot appear twice!", file=sys.stderr)
+                print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
+                sys.exit(1)
+        
             FIRST_TO_DISPLAY = arg.removeprefix('--first=')
             if FIRST_TO_DISPLAY not in ['url', 'title']:
                 print(f"ERR: Invalid value for '--first=' option!", file=sys.stderr)
@@ -403,12 +416,18 @@ def command_line_argument_options_mode():
                 sys.exit(1)
         
         elif arg.startswith('--align='):
+            if TEXT_ALINGMENT != '':
+                print(f"ERR: The flag '--align=' has been set before! It cannot appear twice!", file=sys.stderr)
+                print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
+                sys.exit(1)
+        
             TEXT_ALINGMENT = arg.removeprefix('--align=')
             if TEXT_ALINGMENT not in ['center', 'right', 'left']:
                 print(f"ERR: Invalid value for '--align=' option!", file=sys.stderr)
                 print(f"ERR: Use '--align=[left|center|right]'!", file=sys.stderr)
                 print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
                 sys.exit(1)
+        
         else:
             print(f"ERR: Invalid option {arg}!", file=sys.stderr)
             print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
