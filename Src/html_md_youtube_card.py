@@ -284,7 +284,7 @@ def get_first_online_youtube_url(VIDEO_ID: str) -> str:
 
 
 
-def html_md_code_for_youtube_card_without_title(URL: str, THUMBNAIL: str, TEXT_ALIGNMENT: str, ) -> None:
+def html_md_code_for_youtube_card(URL: str, THUMBNAIL: str, TEXT_ALIGNMENT: str, ) -> None:
     # Example:
     #
     # <div style="border: 1px solid #ddd; padding: 10px; max-width: 300px; position: relative; display: inline-block;">
@@ -300,7 +300,9 @@ def html_md_code_for_youtube_card_without_title(URL: str, THUMBNAIL: str, TEXT_A
     # </div>
     print(f"<div style=\"border: 1px solid #ddd; padding: 10px; max-width: 300px; position: relative; display: inline-block;\">")
     print(f"\t<a href=\"{URL}\" target=\"_blank\" style=\"display: block; position: relative;\">")
+    print(f"\t\t<--!  Thumbnail -->")
     print(f"\t\t<img src=\"{THUMBNAIL}\" alt=\"YouTube Thumbnail\" style=\"width: 100%; display: block;\">")
+    print(f"\t\t<--! Play button in the center -->")
     print(f"\t\t<div style=\"position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: rgba(255, 0, 0, 0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center;\">")
     print(f"\t\t\t<div style=\"width: 0; height: 0; border-left: 15px solid white; border-top: 10px solid transparent; border-bottom: 10px solid transparent;\"></div>")
     print(f"\t\t</div>")
@@ -333,7 +335,9 @@ def html_md_code_for_youtube_card_with_title(TITLE: str, URL: str, THUMBNAIL: st
     print(f"<!--  {TITLE}  -->")
     print(f"<div style=\"border: 1px solid #ddd; padding: 10px; max-width: 300px; position: relative; display: inline-block;\">")
     print(f"\t<a href=\"{URL}\" target=\"_blank\" style=\"display: block; position: relative;\">")
+    print(f"\t\t<--!  Thumbnail -->")
     print(f"\t\t<img src=\"{THUMBNAIL}\" alt=\"YouTube Thumbnail\" style=\"width: 100%; display: block;\">")
+    print(f"\t\t<--! Play button in the center -->")
     print(f"\t\t<div style=\"position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: rgba(255, 0, 0, 0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center;\">")
     print(f"\t\t\t<div style=\"width: 0; height: 0; border-left: 15px solid white; border-top: 10px solid transparent; border-bottom: 10px solid transparent;\"></div>")
     print(f"\t\t</div>")
@@ -384,7 +388,9 @@ def html_md_code_for_basic_youtube_card(URL: str, THUMBNAIL: str) -> None:
     # </div>
     print(f"<div style=\"border: 1px solid #ddd; padding: 10px; max-width: 300px; position: relative; display: inline-block;\">")
     print(f"\t<a href=\"{URL}\" target=\"_blank\" style=\"display: block; position: relative;\">")
+    print(f"\t\t<--!  Thumbnail -->")
     print(f"\t\t<img src=\"{THUMBNAIL}\" alt=\"YouTube Thumbnail\" style=\"width: 100%; display: block;\">")
+    print(f"\t\t<--! Play button in the center -->")
     print(f"\t\t<div style=\"position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: rgba(255, 0, 0, 0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center;\">")
     print(f"\t\t\t<div style=\"width: 0; height: 0; border-left: 15px solid white; border-top: 10px solid transparent; border-bottom: 10px solid transparent;\"></div>")
     print(f"\t\t</div>")
