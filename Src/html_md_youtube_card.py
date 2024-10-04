@@ -435,6 +435,12 @@ def command_line_argument_options_mode(check_resource_online: bool = False):
                 print(f"ERROR: The flag '--url=' has been set before! It cannot appear twice!", file=sys.stderr)
                 print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
                 sys.exit(1)
+            
+            if arg.removeprefix('--url=') == '':
+                print(f"ERROR: The '--url=' option expects to be specified a value!", file=sys.stderr)
+                print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
+                sys.exit(1)
+            
             URL = arg.removeprefix('--url=')
         
         elif arg.startswith('--title='):
@@ -442,15 +448,32 @@ def command_line_argument_options_mode(check_resource_online: bool = False):
                 print(f"ERROR: The flag '--title=' has been set before! It cannot appear twice!", file=sys.stderr)
                 print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
                 sys.exit(1)
+            
+            if arg.removeprefix('--title=') == '':
+                print(f"ERROR: The '--title=' option expects to be specified a value!", file=sys.stderr)
+                print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
+                sys.exit(1)
+            
             TITLE = arg.removeprefix('--title=')
         
         elif arg.startswith('--first='):
+            # Flag was already set
             if FIRST_TO_DISPLAY != '':
                 print(f"ERROR: The flag '--first=' has been set before! It cannot appear twice!", file=sys.stderr)
                 print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
                 sys.exit(1)
-        
+            
+
             FIRST_TO_DISPLAY = arg.removeprefix('--first=')
+
+            # Flag was provided with an empty value
+            if FIRST_TO_DISPLAY == '':
+                print(f"ERROR: The '--first=' option expects to be specified a value!", file=sys.stderr)
+                print(f"Example: --first=[url|title]", file=sys.stderr)
+                print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
+                sys.exit(1)
+
+
             if FIRST_TO_DISPLAY not in ['url', 'title']:
                 print(f"ERROR: Invalid value for '--first=' option!", file=sys.stderr)
                 print(f"ERROR: Use '--first=[url|title]'!", file=sys.stderr)
@@ -458,12 +481,22 @@ def command_line_argument_options_mode(check_resource_online: bool = False):
                 sys.exit(1)
         
         elif arg.startswith('--align='):
+            # Flag already set
             if TEXT_ALINGMENT != '':
                 print(f"ERROR: The flag '--align=' has been set before! It cannot appear twice!", file=sys.stderr)
                 print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
                 sys.exit(1)
         
             TEXT_ALINGMENT = arg.removeprefix('--align=')
+
+            # Flag is provided with an empty value
+            if TEXT_ALINGMENT == '':
+                print(f"ERROR: The '--align=' option expects to be specified a value!", file=sys.stderr)
+                print(f"Example: --first=[left|center|right]", file=sys.stderr)
+                print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
+                sys.exit(1)
+            
+            # Flag is provided with an invalid value
             if TEXT_ALINGMENT not in ['center', 'right', 'left']:
                 print(f"ERROR: Invalid value for '--align=' option!", file=sys.stderr)
                 print(f"ERROR: Use '--align=[left|center|right]'!", file=sys.stderr)
@@ -477,7 +510,7 @@ def command_line_argument_options_mode(check_resource_online: bool = False):
 
     if TITLE == '' and FIRST_TO_DISPLAY != '':
         print(f"ERROR: The option '--first=' also requires using '--title='!", file=sys.stderr)
-        print(f"ERROR: If you use the '--first=' option, you also need to provide the title!")
+        print(f"ERROR: If you use the '--first=' option, you also need to provide the title!", file=sys.stderr)
         print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
         sys.exit(1)
 
@@ -674,7 +707,6 @@ def help_option():
     print(f"\t\tOptions for '--first=':")
     print(f"\t\t\t* 'url' (default)")
     print(f"\t\t\t* 'title'")
-    print(f"\t\t\t\t> '--first=' must be specified only after '--url=' and '--title=' flag.")
     print(f"\t\tOptions for '--align=':")
     print(f"\t\t\t* 'left'")
     print(f"\t\t\t* 'center' (default)")
