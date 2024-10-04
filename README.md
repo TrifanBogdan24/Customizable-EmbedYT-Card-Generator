@@ -169,6 +169,46 @@ $ html_md_youtube_card --url=$URL --title=$TITLE --first=[url|title] --align=[le
 ```
 
 
+If you want to make sure that the `URL`s are real
+and they exist online, use the `-e`/`--exists-online` **option**.
+
+> NOTE: The **flag** `-e`/`--exists-online` should be the first one passed to the script.
+
+
+```bash
+# Checking URLs online
+$ html_md_youtube_card -e $URL
+$ html_md_youtube_card -e --url=$URL
+
+# Except '-e'/'--exists-online', it doesn't matter the order of the options
+$ html_md_youtube_card -e --url=$URL
+$ html_md_youtube_card -e --url=$URL --align=[left|center|right]
+$ html_md_youtube_card -e --url=$URL --title=$TITLE
+$ html_md_youtube_card -e --url=$URL --title=$TITLE --align=[left|center|right]
+$ html_md_youtube_card -e --url=$URL --title=$TITLE --first=[url|title]
+$ html_md_youtube_card -e --url=$URL --title=$TITLE --first=[url|title] --align=[left|center|right]
+```
+
+
+
+
+```bash
+# Checking URLs online
+$ html_md_youtube_card -e $URL
+$ html_md_youtube_card -e --url=$URL
+
+# Except '-e'/'--exists-online', it doesn't matter the order of the options
+$ html_md_youtube_card --exists-online --url=$URL
+$ html_md_youtube_card --exists-online --url=$URL --align=[left|center|right]
+$ html_md_youtube_card --exists-online --url=$URL --title=$TITLE
+$ html_md_youtube_card --exists-online --url=$URL --title=$TITLE --align=[left|center|right]
+$ html_md_youtube_card --exists-online --url=$URL --title=$TITLE --first=[url|title]
+$ html_md_youtube_card --exists-online --url=$URL --title=$TITLE --first=[url|title] --align=[left|center|right]
+```
+
+
+
+
 # Code Examples
 
 

@@ -13,6 +13,7 @@ rg_end_of_url: re = r'[\/\?]?$'
 
 
 
+
 # For 'manually' getting the VIDEO ID
 
 rgx_01_YT_video: re = r'^https://youtu.be/[A-Za-z0-9-_]{11}[\/\?]?$'
@@ -43,9 +44,10 @@ def is_digit(c: str) -> bool:
     return c.isdigit()
 
 
-def get_id_of_youtube_url(url: str) -> str:
+def get_id_of_youtube_url(url: str, check_resource_online: bool = False) -> str:
     """
-    The function is given a string, representing an URL.
+    The function is given a string (representing an URL)
+    and a boolean value (that specifies whether to check the existance of the URL online or not).
     
     The function matches the string against a few REGEX for YouTube links.
     
@@ -54,20 +56,21 @@ def get_id_of_youtube_url(url: str) -> str:
     """
 
 
-    try:
-        if requests.get("https://google.com").ok is True and requests.get("https://www.youtube.com/").ok is True and requests.get(url).ok is False:
-            print(f"ERR: {url} is not available online!", file=sys.stderr)
-            print(f"Do you want to continue anyway? y/N", end = ' ')
-            while True:
-                user_input = input().strip().lower()
-                if user_input in ['y', 'yes']:
-                    break
-                elif user_input in ['n', 'no']:
-                    sys.exit(1)
-                else:
-                    print(f"ERR: Unrecognize response! Please type 'y' for YES and 'n' for NO!", file=sys.stderr)
-    except:
-        pass
+    if check_resource_online == True:
+        try:
+            if requests.get("https://google.com").ok is True and requests.get("https://www.youtube.com/").ok is True and requests.get(url).ok is False:
+                print(f"ERROR: {url} is not available online!", file=sys.stderr)
+                print(f"Do you want to continue anyway? y/N", end = ' ')
+                while True:
+                    user_input = input().strip().lower()
+                    if user_input in ['y', 'yes']:
+                        break
+                    elif user_input in ['n', 'no']:
+                        sys.exit(1)
+                    else:
+                        print(f"ERROR: Unrecognize response! Please type 'y' for YES and 'n' for NO!", file=sys.stderr)
+        except:
+            pass
 
 
 
@@ -163,7 +166,7 @@ def get_id_of_youtube_url(url: str) -> str:
         if match:
             return match.group(1)  # Return the video ID
 
-        print(f"ERR: The provided URL '{url}' is not a valid YouTube link!", file = sys.stderr)
+        print(f"ERROR: The provided URL '{url}' is not a valid YouTube link!", file = sys.stderr)
         print(f"Please run '{sys.argv[0]} -r' to see the REGEX that validate the URL.", file=sys.stderr)
         print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
 
@@ -172,7 +175,28 @@ def get_id_of_youtube_url(url: str) -> str:
         
 
 
-def get_youtube_thumbnail(VIDEO_ID: str) -> str:
+def get_youtube_thumbnail(VIDEO_ID: str, check_resource_online: bool = False) -> str:
+    """
+    The function receives two arguments:
+    - The first one represents the ID of an YouTube Video/Short.
+    - The second one is a boolean value:
+        * If 'True':
+            It means the flag '-e'/'--exists-online' was set
+            and a request to that URL will be sent.
+            If the resource does not exist online,
+            the script will ask the user whether to generate the embeded code or not.
+        * If 'False':
+            The URL of the thumbnail will be directly returned
+    """
+
+
+    if check_resource_online == False:
+        return f"https://img.youtube.com/vi/{VIDEO_ID}/hqdefault.jpg"
+    else:
+        return get_first_online_youtube_url(VIDEO_ID)
+
+
+def get_first_online_youtube_url(VIDEO_ID: str) -> str:
     """
     The function receives an argument, a VIDEO_ID.
     Return the URL of the thumbnail associated with that ID.
@@ -196,7 +220,7 @@ def get_youtube_thumbnail(VIDEO_ID: str) -> str:
     thumbnail_4: str = f"https://img.youtube.com/vi/{VIDEO_ID}/sddefault.jpg"
 
 
-    internet_connection = False
+    internet_connection: bool = False
 
     try:
         if requests.get("https://google.com").ok is True and requests.get("https://www.youtube.com/").ok is True:
@@ -228,18 +252,29 @@ def get_youtube_thumbnail(VIDEO_ID: str) -> str:
             if requests.get(thumbnail_4).ok is True:
                 return thumbnail_4
         except:
-            print("ERR: Could not find thumnbail for YouTube VIDEO ID = {VIDEO_ID}", file=sys.stdout)
+            print("ERROR: Could not find thumnbail for YouTube VIDEO ID = {VIDEO_ID}", file=sys.stdout)
             print("Would you like to continue generating HTML/MD code with default THUMBNAIL URL? Y/n", end = ' ')
             while True:
                 user_input = input().strip().lower()
                 if user_input in ['y', 'yes']:
-                    return thumbnail_1
+                    break
                 elif user_input in ['n', 'no']:
                     sys.exit(1)
                 else:
-                    print(f"ERR: Unrecognize response! Please type 'y' for YES and 'n' for NO!", file=sys.stderr)
+                    print(f"ERROR: Unrecognize response! Please type 'y' for YES and 'n' for NO!", file=sys.stderr)
+            return thumbnail_1
     else:
         # No internet, therefore the first thumbnail URL will be returend
+        print("ERROR: No internet connection!", file=sys.stdout)
+        print("Would you like to generate the HTML/MD code anyway, with default THUMBNAIL URL? Y/n", end = ' ')
+        while True:
+                user_input = input().strip().lower()
+                if user_input in ['y', 'yes']:
+                    break
+                elif user_input in ['n', 'no']:
+                    sys.exit(1)
+                else:
+                    print(f"ERROR: Unrecognize response! Please type 'y' for YES and 'n' for NO!", file=sys.stderr)
         return thumbnail_1
 
 
@@ -364,87 +399,94 @@ def html_md_code_for_basic_youtube_card(URL: str, THUMBNAIL: str) -> None:
 
 
 
-def command_line_simple_url_mode():
+def command_line_simple_url_mode(check_resource_online: bool = False) -> None:
+    """
+    Cases:
+    $ html_md_youtube_card $URL
+    $ html_md_youtube_card -e $URL
+    $ html_md_youtube_card --exists-online $URL
+    """
+    
     URL: str = ''
     VIDEO_ID: str = ''
 
-    URL = sys.argv[1]
-    VIDEO_ID = get_id_of_youtube_url(URL)
+    URL = sys.argv[1] if check_resource_online == False else sys.argv[2]
+    VIDEO_ID = get_id_of_youtube_url(URL, check_resource_online)
 
     if VIDEO_ID == '':
         sys.exit(1)
 
-    THUMBNAIL = get_youtube_thumbnail(VIDEO_ID)
+    THUMBNAIL = get_youtube_thumbnail(VIDEO_ID, check_resource_online)
     html_md_code_for_basic_youtube_card(URL, THUMBNAIL)
 
 
 
-def command_line_argument_options_mode():
-    arguments: List[str] = sys.argv[1:].sort()
-
+def command_line_argument_options_mode(check_resource_online: bool = False):
     URL = ''
     TITLE = ''
     FIRST_TO_DISPLAY = ''  # 'url' or 'title'
     TEXT_ALINGMENT = ''    # 'center', 'left' or 'right'
 
-    for arg in sys.argv[1:]:
+    cmd_options: List[str] = sys.argv[2:] if check_resource_online == True else sys.argv[1:]
+
+    for arg in cmd_options:
         if arg.startswith('--url='):
             if URL != '':
-                print(f"ERR: The flag '--url=' has been set before! It cannot appear twice!", file=sys.stderr)
+                print(f"ERROR: The flag '--url=' has been set before! It cannot appear twice!", file=sys.stderr)
                 print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
                 sys.exit(1)
             URL = arg.removeprefix('--url=')
         
         elif arg.startswith('--title='):
             if TITLE != '':
-                print(f"ERR: The flag '--title=' has been set before! It cannot appear twice!", file=sys.stderr)
+                print(f"ERROR: The flag '--title=' has been set before! It cannot appear twice!", file=sys.stderr)
                 print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
                 sys.exit(1)
             TITLE = arg.removeprefix('--title=')
         
         elif arg.startswith('--first='):
             if FIRST_TO_DISPLAY != '':
-                print(f"ERR: The flag '--first=' has been set before! It cannot appear twice!", file=sys.stderr)
+                print(f"ERROR: The flag '--first=' has been set before! It cannot appear twice!", file=sys.stderr)
                 print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
                 sys.exit(1)
         
             FIRST_TO_DISPLAY = arg.removeprefix('--first=')
             if FIRST_TO_DISPLAY not in ['url', 'title']:
-                print(f"ERR: Invalid value for '--first=' option!", file=sys.stderr)
-                print(f"ERR: Use '--first=[url|title]'!", file=sys.stderr)
+                print(f"ERROR: Invalid value for '--first=' option!", file=sys.stderr)
+                print(f"ERROR: Use '--first=[url|title]'!", file=sys.stderr)
                 print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
                 sys.exit(1)
         
         elif arg.startswith('--align='):
             if TEXT_ALINGMENT != '':
-                print(f"ERR: The flag '--align=' has been set before! It cannot appear twice!", file=sys.stderr)
+                print(f"ERROR: The flag '--align=' has been set before! It cannot appear twice!", file=sys.stderr)
                 print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
                 sys.exit(1)
         
             TEXT_ALINGMENT = arg.removeprefix('--align=')
             if TEXT_ALINGMENT not in ['center', 'right', 'left']:
-                print(f"ERR: Invalid value for '--align=' option!", file=sys.stderr)
-                print(f"ERR: Use '--align=[left|center|right]'!", file=sys.stderr)
+                print(f"ERROR: Invalid value for '--align=' option!", file=sys.stderr)
+                print(f"ERROR: Use '--align=[left|center|right]'!", file=sys.stderr)
                 print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
                 sys.exit(1)
         
         else:
-            print(f"ERR: Invalid option {arg}!", file=sys.stderr)
+            print(f"ERROR: Invalid option {arg}!", file=sys.stderr)
             print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
             sys.exit(1)
 
     if TITLE == '' and FIRST_TO_DISPLAY != '':
-        print(f"ERR: The option '--first=' also requires using '--title='!", file=sys.stderr)
-        print(f"ERR: If you use the '--first=' option, you also need to provide the title!")
+        print(f"ERROR: The option '--first=' also requires using '--title='!", file=sys.stderr)
+        print(f"ERROR: If you use the '--first=' option, you also need to provide the title!")
         print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
         sys.exit(1)
 
 
-    VIDEO_ID = get_id_of_youtube_url(URL)
+    VIDEO_ID = get_id_of_youtube_url(URL, check_resource_online)
     if VIDEO_ID == '':
         sys.exit(1)
 
-    THUMBNAIL = get_youtube_thumbnail(VIDEO_ID)
+    THUMBNAIL = get_youtube_thumbnail(VIDEO_ID, check_resource_online)
 
 
     if TITLE == '':
@@ -465,7 +507,28 @@ def command_line_argument_options_mode():
 
 
 
-def interactive_mode() -> None:
+def interactive_mode(check_resource_online: bool = False) -> None:
+    if len(sys.argv) > 3:
+        print("ERROR: Too many command line arguments specified, in the case of '--interactive' option!", file=sys.stderr)
+        print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
+        sys.exit(1)
+    elif len(sys.argv) == 3:
+        if sys.argv[1] in ['-i', '--interactive'] and sys.argv[2] in ['-i', '--interactive']:
+            print("ERROR: The option '--interactive' is already set! Do not use it twice!", file=sys.stderr)
+            print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
+            sys.exit(1)
+        elif (sys.argv[1] in ['-i', '--interactive'] and sys.argv[2] not in ['-e', '--exists-online']) \
+            or (sys.argv[1] not in ['-e', '--exists-online'] and sys.argv[2] in ['-i', '--interactive']):
+            print(f"ERROR: '--exists-online' is the other (and single) option that is allowed along with '--interactive'", file=sys.stderr)
+            print(f"ERROR: When using '--interactive', only '--exists-online' is expected in the command line!", file=sys.stderr)
+            print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
+            sys.exit(1)
+        elif (sys.argv[1] in ['-i', '--interactive'] and sys.argv[2] in ['-e', '--exists-online']) \
+            or (sys.argv[1] in ['-e', '--exists-online'] and sys.argv[2] in ['-i', '--interactive']):
+            check_resource_online = True
+
+
+
     URL: str = ''
     INLCUDE_TITLE: bool = False
     TITLE: str = ''
@@ -478,7 +541,7 @@ def interactive_mode() -> None:
         if URL == '':
             print("The provided URL cannot be empty!")
         else:
-            VIDEO_ID = get_id_of_youtube_url(URL)
+            VIDEO_ID = get_id_of_youtube_url(URL, check_resource_online)
             if VIDEO_ID != '':
                 break
 
@@ -487,7 +550,7 @@ def interactive_mode() -> None:
     while True:
         user_input = input().strip().lower()
         if user_input not in ['y', 'yes', 'n', 'no']:
-            print(f"ERR: Unrecognize response! Please type 'y' for YES and 'n' for NO", file=sys.stderr)
+            print(f"ERROR: Unrecognize response! Please type 'y' for YES and 'n' for NO", file=sys.stderr)
         else:
             INLCUDE_TITLE = True if user_input in ['y', 'yes'] else False
             break
@@ -522,7 +585,7 @@ def interactive_mode() -> None:
             print("Invalid input! Please type one of the above text alignments!")
 
 
-    THUMBNAIL: str = get_youtube_thumbnail(VIDEO_ID)
+    THUMBNAIL: str = get_youtube_thumbnail(VIDEO_ID, check_resource_online)
 
 
     FIRST_TO_DISPLAY = 'url'
@@ -611,6 +674,7 @@ def help_option():
     print(f"\t\tOptions for '--first=':")
     print(f"\t\t\t* 'url' (default)")
     print(f"\t\t\t* 'title'")
+    print(f"\t\t\t\t> '--first=' must be specified only after '--url=' and '--title=' flag.")
     print(f"\t\tOptions for '--align=':")
     print(f"\t\t\t* 'left'")
     print(f"\t\t\t* 'center' (default)")
@@ -623,10 +687,11 @@ def help_option():
     print(f"\t-i, --interactive      Take input in an user-interactive mode in the command line.")
     print(f"\t-e, --exists-online    Verify if the input and thumbnail URLs exist online.")
     print(f"\t                       If not, ask the user whether to continue anyways or not.")
+    print(f"\t                       By default, the URLs are not checked online.")
     print(f"\t-r, --rgx, --regex     Print the REGEXs used to validate the provided (input) URL.")
     print(f"\t-h, --help             Display this help text and exit")
     print()
-    print("See more at project home page: https://github.com/TrifanBogdan24/EmbedYT-Card-Generator.git")
+    print("See more info at project home page: https://github.com/TrifanBogdan24/EmbedYT-Card-Generator.git")
     print()
 
 
@@ -634,25 +699,78 @@ def help_option():
 
 def main():
     # TODO: implement the `-e`, `--exists-online` flag (only by specifying this flag, online requests are made)
-    if len(sys.argv) == 2 and sys.argv[1] in ['-i', '--interactive']:
-        # exe -i
-        interactive_mode()
+
+
+    if len(sys.argv) == 1:
+        # html_md_youtube_card
+        print(f"ERROR: The script expcets at least an argument/option!", file=sys.stderr)
+        print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
+        sys.exit(1)
     elif len(sys.argv) == 2 and sys.argv[1] in ['-h', '--help']:
-        # exe -h
+        # html_md_youtube_card -h
         help_option()
     elif len(sys.argv) == 2 and sys.argv[1] in ['-r', '--regex', '--rgx']:
+        # html_md_youtube_card -r
         display_used_REGEXs()
+    elif len(sys.argv) == 2 and sys.argv[1] in ['-e', '--exists-online']:
+        # html_md_youtube_card -e
+        print(f"ERROR: Invalid usage of '--exists-online' flag!", file=sys.stderr)
+        print(f"ERROR: This option cannot be used alone!", file=sys.stderr)
+        print(f"ERROR: You must provide an URL/other options", file=sys.stderr)
+        sys.exit(1)
+    elif len(sys.argv) == 2 and sys.argv[1] in ['-i', '--interactive']:
+        # html_md_youtube_card -i
+        interactive_mode(check_resource_online=False)
+    elif len(sys.argv) == 2 and sys.argv[1].startswith('--url='):
+        # html_md_youtube_card --url=$URL
+        command_line_argument_options_mode(check_resource_online=False)
     elif len(sys.argv) == 2:
-        arg: str = sys.argv[1]
-        if arg.startswith('--url='):
-            # exe --url=$URL
-            command_line_argument_options_mode()
-        else:
-            # exe $URL
-            command_line_simple_url_mode()
-    else:
-        command_line_argument_options_mode()
+        # html_md_youtube_card $URL
+        command_line_simple_url_mode(check_resource_online=False)
+    elif len(sys.argv) > 2:
+        check_resource_online: bool = False
 
+        for arg in sys.argv[2:]:
+            if arg in ['-e', '--exists-online']:
+                print(f"ERROR: Invalid flag position!", file=sys.stderr)
+                print(f"ERROR: The option '--exists-online' must be specified right after the script name.", file=sys.stderr)
+                print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
+                sys.exit(1)
+
+        if sys.argv[1] in ['-e', '--exists-online']:
+            # Setting the option
+            check_resource_online = True
+
+            if len(sys.argv) == 3:
+                if sys.argv[2] in ['-i', '--interactive']:
+                    # html_md_youtube_card -e -i
+                    interactive_mode(check_resource_online=True)
+                elif sys.argv[2].startswith('--url='):
+                    # html_md_youtube_card -e --url=$URL
+                    command_line_argument_options_mode(check_resource_online=True)
+                else:
+                    # html_md_youtube_card -e $URL
+                    command_line_simple_url_mode(check_resource_online=True)
+            else:
+                command_line_argument_options_mode(check_resource_online=True)
+        else:
+            check_resource_online: bool = False
+
+            if len(sys.argv) == 2:
+                if sys.argv[1] in ['-i', '--interactive']:
+                    # html_md_youtube_card -i
+                    interactive_mode()
+                elif sys.argv[1].startswith('--url'):
+                    # html_md_youtube_card --url=$URL
+                    command_line_argument_options_mode(check_resource_online=False)
+                else:
+                    # html_md_youtube_card $URL
+                    command_line_simple_url_mode(check_resource_online=False)
+            else:
+                command_line_argument_options_mode(check_resource_online=False)
+
+
+   
 
 
 if __name__ == '__main__':
