@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "/home/bogdan/Documents/INFORMATICA/EmbedYT-Card-Generator/html_md_youtube_card.py", line 4, in <module>
+    import requests
+  File "/home/bogdan/.local/lib/python3.10/site-packages/requests/__init__.py", line 164, in <module>
+    from .api import delete, get, head, options, patch, post, put, request
+  File "/home/bogdan/.local/lib/python3.10/site-packages/requests/api.py", line 11, in <module>
+    from . import sessions
+  File "/home/bogdan/.local/lib/python3.10/site-packages/requests/sessions.py", line 15, in <module>
+    from .adapters import HTTPAdapter
+  File "/home/bogdan/.local/lib/python3.10/site-packages/requests/adapters.py", line 77, in <module>
+    _preloaded_ssl_context.load_verify_locations(
+KeyboardInterrupt
