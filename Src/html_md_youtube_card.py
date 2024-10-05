@@ -40,18 +40,38 @@ full_youtube_regex = re.compile(
 
 
 
-rgx_match_0_to_59: str = r'([0-9]|[0-5][0-9])'                              # 0 - 59  (including leading zeros)
-rgx_match_0_to_23: str = r'([0-9]|[0-1][0-9]|2[0-3])'                                 # 0 - 23  (including leading zeros)
-rgx_match_0_to_364: str = r'([0-2][0-9][0-9]|3[0-5][0-9]|36[0-4]|0[0-9]{2})'   # 0 - 364 (including leading zeros)
-rgx_match_0_to_inf: str = r'[0-9]*'
+def validate_videoclip_duration(duration: str) -> bool:
+    rgx_match_0_to_59: str = r'([0-9]|[0-5][0-9])'                                  # 0 - 59  (including leading zeros)
+    rgx_match_0_to_23: str = r'([0-9]|[0-1][0-9]|2[0-3])'                           # 0 - 23  (including leading zeros)
+    rgx_match_0_to_364: str = r'([0-2][0-9][0-9]|3[0-5][0-9]|36[0-4]|0[0-9]{2})'    # 0 - 364 (including leading zeros)
+    rgx_match_0_to_inf: str = r'[0-9]*'
 
 
-# For each of these REGEXs, print the matching lines of 'numbers.txt'
-rgx_match_minutes: str = rf'^{rgx_match_0_to_59}$'                                                              # [0-59]
-rgx_match_hours: str = rf'^{rgx_match_0_to_59}:{rgx_match_0_to_59}$'                                            # [0-59]  : [0-59]
-rgx_match_days_1: str = rf'^{rgx_match_0_to_23}:{rgx_match_0_to_59}:{rgx_match_0_to_59}$'                       # [0-23]  : [0-59] : [0-59]
-rgx_match_days_2: str = rf'^{rgx_match_0_to_inf}:{rgx_match_0_to_59}:{rgx_match_0_to_59}$'                      # [0-INF] : [0-59] : [0-59]
-rgx_match_years: str = rf'^{rgx_match_0_to_inf}:{rgx_match_0_to_23}:{rgx_match_0_to_59}:{rgx_match_0_to_59}$'   # [0-INF] : [0-24] : [0-60] : [0-60]
+    rgx_match_minutes: str = rf'^{rgx_match_0_to_59}$'                                                                # [0-59]
+    rgx_match_hours: str = rf'^{rgx_match_0_to_59}:{rgx_match_0_to_59}$'                                              # [0-59]  : [0-59]
+    rgx_match_days_1: str = rf'^{rgx_match_0_to_23}:{rgx_match_0_to_59}:{rgx_match_0_to_59}$'                         # [0-23]  : [0-59] : [0-59]
+    rgx_match_days_2: str = rf'^{rgx_match_0_to_inf}:{rgx_match_0_to_59}:{rgx_match_0_to_59}$'                        # [0-INF] : [0-59] : [0-59]
+    rgx_match_years_1: str = rf'^{rgx_match_0_to_364}:{rgx_match_0_to_23}:{rgx_match_0_to_59}:{rgx_match_0_to_59}$'   # [0-INF] : [0-24] : [0-60] : [0-60]
+    rgx_match_years_2: str = rf'^{rgx_match_0_to_inf}:{rgx_match_0_to_23}:{rgx_match_0_to_59}:{rgx_match_0_to_59}$'   # [0-INF] : [0-24] : [0-60] : [0-60]
+    
+
+    if re.match(rgx_match_minutes, duration) is not None:
+        return True
+    if re.match(rgx_match_hours, duration) is not None:
+        return True
+    if re.match(rgx_match_days_1, duration) is not None:
+        return True
+    if re.match(rgx_match_days_2, duration) is not None:
+        return True
+    if re.match(rgx_match_years_1, duration) is not None:
+        return True
+    if re.match(rgx_match_years_2, duration) is not None:
+        return True
+
+    # The duration of the videclip was not valided by the REGEXs
+    return False
+
+
 
 
 
@@ -77,7 +97,7 @@ def get_id_of_youtube_url(url: str, check_resource_online: bool = False) -> str:
     if check_resource_online == True:
         try:
             if requests.get("https://google.com").ok is True and requests.get("https://www.youtube.com/").ok is True and requests.get(url).ok is False:
-                print(f"ERROR: {url} is not available online!", file=sys.stderr)
+                print(f"[ERROR] {url} is not available online!", file=sys.stderr)
                 print(f"Do you want to continue anyway? y/N", end = ' ')
                 while True:
                     user_input = input().strip().lower()
@@ -86,7 +106,7 @@ def get_id_of_youtube_url(url: str, check_resource_online: bool = False) -> str:
                     elif user_input in ['n', 'no']:
                         sys.exit(1)
                     else:
-                        print(f"ERROR: Unrecognize response! Please type 'y' for YES and 'n' for NO!", file=sys.stderr)
+                        print(f"[ERROR] Unrecognized response! Please type 'y' for YES and 'n' for NO!", file=sys.stderr)
         except:
             pass
 
@@ -184,7 +204,7 @@ def get_id_of_youtube_url(url: str, check_resource_online: bool = False) -> str:
         if match:
             return match.group(1)  # Return the video ID
 
-        print(f"ERROR: The provided URL '{url}' is not a valid YouTube link!", file = sys.stderr)
+        print(f"[ERROR] The provided URL '{url}' is not a valid YouTube link!", file = sys.stderr)
         print(f"Please run '{sys.argv[0]} -r' to see the REGEX that validate the URL.", file=sys.stderr)
         print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
 
@@ -270,7 +290,7 @@ def get_first_online_youtube_url(VIDEO_ID: str) -> str:
             if requests.get(thumbnail_4).ok is True:
                 return thumbnail_4
         except:
-            print("ERROR: Could not find thumnbail for YouTube VIDEO ID = {VIDEO_ID}", file=sys.stdout)
+            print("[ERROR] Could not find thumnbail for YouTube VIDEO ID = {VIDEO_ID}", file=sys.stdout)
             print("Would you like to continue generating HTML/MD code with default THUMBNAIL URL? Y/n", end = ' ')
             while True:
                 user_input = input().strip().lower()
@@ -279,11 +299,11 @@ def get_first_online_youtube_url(VIDEO_ID: str) -> str:
                 elif user_input in ['n', 'no']:
                     sys.exit(1)
                 else:
-                    print(f"ERROR: Unrecognize response! Please type 'y' for YES and 'n' for NO!", file=sys.stderr)
+                    print(f"[ERROR] Unrecognized response! Please type 'y' for YES and 'n' for NO!", file=sys.stderr)
             return thumbnail_1
     else:
         # No internet, therefore the first thumbnail URL will be returend
-        print("ERROR: No internet connection!", file=sys.stdout)
+        print("[ERROR] No internet connection!", file=sys.stdout)
         print("Would you like to generate the HTML/MD code anyway, with default THUMBNAIL URL? Y/n", end = ' ')
         while True:
                 user_input = input().strip().lower()
@@ -292,7 +312,7 @@ def get_first_online_youtube_url(VIDEO_ID: str) -> str:
                 elif user_input in ['n', 'no']:
                     sys.exit(1)
                 else:
-                    print(f"ERROR: Unrecognize response! Please type 'y' for YES and 'n' for NO!", file=sys.stderr)
+                    print(f"[ERROR] Unrecognized response! Please type 'y' for YES and 'n' for NO!", file=sys.stderr)
         return thumbnail_1
 
 
@@ -505,12 +525,12 @@ def command_line_argument_options_mode(check_resource_online: bool = False):
     for arg in cmd_options:
         if arg.startswith('--url='):
             if URL != '':
-                print(f"ERROR: The flag '--url=' has been set before! It cannot appear twice!", file=sys.stderr)
+                print(f"[ERROR] The flag '--url=' has been set before! It cannot appear twice!", file=sys.stderr)
                 print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
                 sys.exit(1)
             
             if arg.removeprefix('--url=') == '':
-                print(f"ERROR: The '--url=' option expects to be specified a value!", file=sys.stderr)
+                print(f"[ERROR] The '--url=' option expects to be specified a value!", file=sys.stderr)
                 print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
                 sys.exit(1)
             
@@ -518,12 +538,12 @@ def command_line_argument_options_mode(check_resource_online: bool = False):
         
         elif arg.startswith('--title='):
             if TITLE != '':
-                print(f"ERROR: The flag '--title=' has been set before! It cannot appear twice!", file=sys.stderr)
+                print(f"[ERROR] The flag '--title=' has been set before! It cannot appear twice!", file=sys.stderr)
                 print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
                 sys.exit(1)
             
             if arg.removeprefix('--title=') == '':
-                print(f"ERROR: The '--title=' option expects to be specified a value!", file=sys.stderr)
+                print(f"[ERROR] The '--title=' option expects to be specified a value!", file=sys.stderr)
                 print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
                 sys.exit(1)
             
@@ -532,7 +552,7 @@ def command_line_argument_options_mode(check_resource_online: bool = False):
         elif arg.startswith('--first='):
             # Flag was already set
             if FIRST_TO_DISPLAY != '':
-                print(f"ERROR: The flag '--first=' has been set before! It cannot appear twice!", file=sys.stderr)
+                print(f"[ERROR] The flag '--first=' has been set before! It cannot appear twice!", file=sys.stderr)
                 print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
                 sys.exit(1)
             
@@ -540,59 +560,98 @@ def command_line_argument_options_mode(check_resource_online: bool = False):
             FIRST_TO_DISPLAY = arg.removeprefix('--first=')
 
 
+            # Removing trailing apostrophes/quotation marks
+            if (FIRST_TO_DISPLAY.startswith('\'') and FIRST_TO_DISPLAY.endswith('\'')) \
+                or (FIRST_TO_DISPLAY.startswith('\"') and FIRST_TO_DISPLAY.endswith('\"')):
+                FIRST_TO_DISPLAY = FIRST_TO_DISPLAY[1:-1]
+            
             # Flag was provided with an empty value
             if FIRST_TO_DISPLAY == '':
-                print(f"ERROR: The '--first=' option expects to be specified a value!", file=sys.stderr)
+                print(f"[ERROR] The '--first=' option expects to be specified a value!", file=sys.stderr)
                 print(f"Example: --first=[url|title]", file=sys.stderr)
                 print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
                 sys.exit(1)
 
 
-            if (FIRST_TO_DISPLAY.startswith('\'') and FIRST_TO_DISPLAY.endswith('\'')) \
-                or (FIRST_TO_DISPLAY.startswith('\"') and FIRST_TO_DISPLAY.endswith('\"')):
-                FIRST_TO_DISPLAY = FIRST_TO_DISPLAY[1:-1]
-
             if FIRST_TO_DISPLAY not in ['url', 'title']:
-                print(f"ERROR: Invalid value for '--first=' option!", file=sys.stderr)
-                print(f"ERROR: Use '--first=[url|title]'!", file=sys.stderr)
+                print(f"[ERROR] Invalid value for '--first=' option!", file=sys.stderr)
+                print(f"[ERROR] Use '--first=[url|title]'!", file=sys.stderr)
                 print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
                 sys.exit(1)
         
         elif arg.startswith('--align='):
             # Flag already set
             if TEXT_ALIGNMENT != '':
-                print(f"ERROR: The flag '--align=' has been set before! It cannot appear twice!", file=sys.stderr)
+                print(f"[ERROR] The flag '--align=' has been set before! It cannot appear twice!", file=sys.stderr)
                 print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
                 sys.exit(1)
         
             TEXT_ALIGNMENT = arg.removeprefix('--align=')
 
+            # Removing trailing apostrophes/quotation marks
+            if (TEXT_ALIGNMENT.startswith('\'') and TEXT_ALIGNMENT.endswith('\'')) \
+                or (TEXT_ALIGNMENT.startswith('\"') and TEXT_ALIGNMENT.endswith('\"')):
+                TEXT_ALIGNMENT = TEXT_ALIGNMENT[1:-1]
+
             # Flag is provided with an empty value
             if TEXT_ALIGNMENT == '':
-                print(f"ERROR: The '--align=' option expects to be specified a value!", file=sys.stderr)
+                print(f"[ERROR] The '--align=' option expects to be specified a value!", file=sys.stderr)
                 print(f"Example: --first=[left|center|right]", file=sys.stderr)
                 print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
                 sys.exit(1)
 
-            if (TEXT_ALIGNMENT.startswith('\'') and TEXT_ALIGNMENT.endswith('\'')) \
-                or (TEXT_ALIGNMENT.startswith('\"') and TEXT_ALIGNMENT.endswith('\"')):
-                TEXT_ALIGNMENT = TEXT_ALIGNMENT[1:-1]
             
             # Flag is provided with an invalid value
             if TEXT_ALIGNMENT not in ['center', 'right', 'left']:
-                print(f"ERROR: Invalid value for '--align=' option!", file=sys.stderr)
-                print(f"ERROR: Use '--align=[left|center|right]'!", file=sys.stderr)
+                print(f"[ERROR] Invalid value for '--align=' option!", file=sys.stderr)
+                print(f"[ERROR] Use '--align=[left|center|right]'!", file=sys.stderr)
                 print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
                 sys.exit(1)
         
+        elif arg.startswith('--duration='):
+            # Flag was already set
+            if DURATION != '':
+                print(f"[ERROR] The flag '--duration=' has been set before! It cannot appear twice!", file=sys.stderr)
+                print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
+                sys.exit(1)
+
+            DURATION = arg.removeprefix('--duration=')
+
+            # Removing trailing apostrophes/quotation marks
+            if (DURATION.startswith('\'') and DURATION.endswith('\'')) \
+                or (DURATION.startswith('\"') and DURATION.endswith('\"')):
+                DURATION = DURATION[1:-1]
+
+            # Flag is provided with an empty value
+            if DURATION == '':
+                print(f"[ERROR] The '--duration=' option expects to be specified a value!", file=sys.stderr)
+                print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
+                sys.exit(1)
+
+            
+            if validate_videoclip_duration(DURATION) is False:
+                print(f"[ERROR] Invalid input for '--duration' (of the videoclip)!", file=sys.stderr)
+                print(f"[ERROR] {DURATION} was not validated by any REGEX!", file=sys.stderr)
+                print(f"Please run '{sys.argv[0]} -r' to see the REGEXs it is matched against.", file=sys.stderr)
+                print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
+                sys.exit(0)
+
+        elif arg in ['-c', '--comments', '--add-comments']:
+            # Flag was already set
+            if ADD_COMMENTS is True:
+                print(f"[ERROR] The option for COMMENTS has been set before! It cannot appear twice!", file=sys.stderr)
+                print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
+                sys.exit(1)
+
+            ADD_COMMENTS = True
         else:
-            print(f"ERROR: Invalid option {arg}!", file=sys.stderr)
+            print(f"[ERROR] Invalid option {arg}!", file=sys.stderr)
             print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
             sys.exit(1)
 
     if TITLE == '' and FIRST_TO_DISPLAY != '':
-        print(f"ERROR: The option '--first=' also requires using '--title='!", file=sys.stderr)
-        print(f"ERROR: If you use the '--first=' option, you also need to provide the title!", file=sys.stderr)
+        print(f"[ERROR] The option '--first=' also requires using '--title='!", file=sys.stderr)
+        print(f"[ERROR] If you use the '--first=' option, you also need to provide the title!", file=sys.stderr)
         print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
         sys.exit(1)
 
@@ -618,20 +677,23 @@ def command_line_argument_options_mode(check_resource_online: bool = False):
 
 def interactive_mode(check_resource_online: bool = False) -> None:
     if len(sys.argv) > 3:
-        print("ERROR: Too many command line arguments specified, in the case of '--interactive' option!", file=sys.stderr)
+        print("[ERROR] Too many command line arguments specified, in the case of '--interactive' option!", file=sys.stderr)
         print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
         sys.exit(1)
+    
     elif len(sys.argv) == 3:
         if sys.argv[1] in ['-i', '--interactive'] and sys.argv[2] in ['-i', '--interactive']:
-            print("ERROR: The option '--interactive' is already set! Do not use it twice!", file=sys.stderr)
+            print("[ERROR] The option '--interactive' is already set! Do not use it twice!", file=sys.stderr)
             print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
             sys.exit(1)
+    
         elif (sys.argv[1] in ['-i', '--interactive'] and sys.argv[2] not in ['-e', '--exists-online']) \
             or (sys.argv[1] not in ['-e', '--exists-online'] and sys.argv[2] in ['-i', '--interactive']):
-            print(f"ERROR: '--exists-online' is the other (and single) option that is allowed along with '--interactive'", file=sys.stderr)
-            print(f"ERROR: When using '--interactive', only '--exists-online' is expected in the command line!", file=sys.stderr)
+            print(f"[ERROR] '--exists-online' is the other (and single) option that is allowed along with '--interactive'", file=sys.stderr)
+            print(f"[ERROR] When using '--interactive', only '--exists-online' is expected in the command line!", file=sys.stderr)
             print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
             sys.exit(1)
+    
         elif (sys.argv[1] in ['-i', '--interactive'] and sys.argv[2] in ['-e', '--exists-online']) \
             or (sys.argv[1] in ['-e', '--exists-online'] and sys.argv[2] in ['-i', '--interactive']):
             check_resource_online = True
@@ -643,6 +705,7 @@ def interactive_mode(check_resource_online: bool = False) -> None:
     TITLE: str = ''
     FIRST_TO_DISPLAY: str = ''  # Title first ('title') or URL first ('url')
     TEXT_ALIGNMENT: str = ''
+    INCLUDE_DURATION: bool = False
     DURATION: str = ''
     ADD_COMMENTS: bool = False
 
@@ -654,7 +717,10 @@ def interactive_mode(check_resource_online: bool = False) -> None:
             print("The provided URL cannot be empty!")
         else:
             VIDEO_ID = get_id_of_youtube_url(URL, check_resource_online)
-            if VIDEO_ID != '':
+            if VIDEO_ID == '':
+                print(f"[ERROR] Cannot get VIDEO_ID for the following URL {URL}!", file=sys.stderr)
+                print(f"[ERROR] The provided URL was not validated by REGEXs!", file=sys.stderr)
+            else:
                 break
 
 
@@ -662,7 +728,7 @@ def interactive_mode(check_resource_online: bool = False) -> None:
     while True:
         user_input = input().strip().lower()
         if user_input not in ['y', 'yes', 'n', 'no']:
-            print(f"ERROR: Unrecognize response! Please type 'y' for YES and 'n' for NO", file=sys.stderr)
+            print(f"[ERROR] Unrecognized response! Please type 'y' for YES and 'n' for NO", file=sys.stderr)
         else:
             INLCUDE_TITLE = True if user_input in ['y', 'yes'] else False
             break
@@ -681,8 +747,41 @@ def interactive_mode(check_resource_online: bool = False) -> None:
             else:
                 break
 
-    
 
+    print("Would you like to include the duration of the YouTube Video/Short? Y/n", end='')
+    while True:
+        user_input = input().strip().lower()
+        if user_input in ['y', 'yes']:
+            INCLUDE_DURATION = True
+            break
+        elif user_input in ['n', 'no']:
+            INCLUDE_DURATION = False
+            break
+        else:
+            print(f"[ERROR] Unrecognized response! Please type 'y' for YES and 'n' for NO", file=sys.stderr)
+
+
+    if INCLUDE_DURATION is True:
+        while True:
+            DURATION = input("Video duration: ").strip().lower()
+            if validate_videoclip_duration(DURATION) is False:
+                print(f"[ERROR] Invalid input for '--duration' (of the videoclip)!", file=sys.stderr)
+                print(f"[ERROR] {DURATION} was not validated by any REGEX!", file=sys.stderr)
+            else:
+                break
+
+
+
+    print("Would you like to include relevant comments in the generated HTML/MD code? Y/n", end=' ')
+    while True:
+        user_input = input().strip().lower()
+        if user_input not in ['y', 'yes', 'n', 'no']:
+            print(f"[ERROR] Unrecognized response! Please type 'y' for YES and 'n' for NO", file=sys.stderr)
+        else:
+            ADD_COMMENTS = True if user_input in ['y', 'yes'] else False
+            break
+
+    
 
     print("Which text alignment do you prefer?")
     print("* left")
@@ -694,7 +793,7 @@ def interactive_mode(check_resource_online: bool = False) -> None:
             TEXT_ALIGNMENT = response
             break
         else:
-            print("Invalid input! Please type one of the above text alignments!")
+            print("[ERROR] Invalid input! Please type one of the above text alignments!", file=sys.stderr)
 
 
     THUMBNAIL: str = get_youtube_thumbnail(VIDEO_ID, check_resource_online)
@@ -785,7 +884,7 @@ def help_option():
     print("USAGE:")
     print(f"\t{sys.argv[0]} $URL")
     print()
-    print(f"\t{sys.argv[0]} --url=$URL --title=$TITLE --first=... --align=...")
+    print(f"\t{sys.argv[0]} --url=$URL --title=$TITLE --duration=$DURATION --first=... --align=...")
     print(f"\t\tOptions for '--first=':")
     print(f"\t\t\t* 'url' (default)")
     print(f"\t\t\t* 'title'")
@@ -802,6 +901,10 @@ def help_option():
     print(f"\t-e, --exists-online    Verify if the input and thumbnail URLs exist online.")
     print(f"\t                       If not, ask the user whether to continue anyways or not.")
     print(f"\t                       By default, the URLs are not checked online.")
+    print(f"\t-c, --comments         Add relevant comments in the generated HTML/MarkDown code.")
+    print(f"\t                       NOTE: This flag works only with options!")
+    print(f"\t--add-comments         Add relevant comments in the generated HTML/MarkDown code. (same as above)")
+    print(f"\t                       NOTE: This flag works only with options!")
     print(f"\t-r, --rgx, --regex     Print the REGEXs used to validate the provided (input) URL.")
     print(f"\t-h, --help             Display this help text and exit")
     print()
@@ -814,7 +917,7 @@ def help_option():
 def main():
     if len(sys.argv) == 1:
         # html_md_youtube_card
-        print(f"ERROR: The script expcets at least an argument/option!", file=sys.stderr)
+        print(f"[ERROR] The script expcets at least an argument/option!", file=sys.stderr)
         print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
         sys.exit(1)
     elif len(sys.argv) == 2 and sys.argv[1] in ['-h', '--help']:
@@ -825,9 +928,9 @@ def main():
         display_used_REGEXs()
     elif len(sys.argv) == 2 and sys.argv[1] in ['-e', '--exists-online']:
         # html_md_youtube_card -e
-        print(f"ERROR: Invalid usage of '--exists-online' flag!", file=sys.stderr)
-        print(f"ERROR: This option cannot be used alone!", file=sys.stderr)
-        print(f"ERROR: You must provide an URL/other options", file=sys.stderr)
+        print(f"[ERROR] Invalid usage of '--exists-online' flag!", file=sys.stderr)
+        print(f"[ERROR] This option cannot be used alone!", file=sys.stderr)
+        print(f"[ERROR] You must provide an URL/other options", file=sys.stderr)
         sys.exit(1)
     elif len(sys.argv) == 2 and sys.argv[1] in ['-i', '--interactive']:
         # html_md_youtube_card -i
@@ -843,8 +946,8 @@ def main():
 
         for arg in sys.argv[2:]:
             if arg in ['-e', '--exists-online']:
-                print(f"ERROR: Invalid flag position!", file=sys.stderr)
-                print(f"ERROR: The option '--exists-online' must be specified right after the script name.", file=sys.stderr)
+                print(f"[ERROR] Invalid flag position!", file=sys.stderr)
+                print(f"[ERROR] The option '--exists-online' must be specified right after the script name.", file=sys.stderr)
                 print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
                 sys.exit(1)
 
