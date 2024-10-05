@@ -13,7 +13,7 @@ rgx_playlist_id: str = r'[A-Za-z0-9-_]{34}'
 rg_end_of_url: str = r'[\/\?]?$'
 
 
-
+# REGEXs for URL
 
 # For 'manually' getting the VIDEO ID
 
@@ -41,20 +41,34 @@ full_youtube_regex = re.compile(
 
 
 
+
+# REGEXs for duration
+
+
+rgx_match_0_to_59: str = r'([0-9]|[0-5][0-9])'                                  # 0 - 59  (including leading zeros)
+rgx_match_0_to_23: str = r'([0-9]|[0-1][0-9]|2[0-3])'                           # 0 - 23  (including leading zeros)
+rgx_match_0_to_364: str = r'([0-2][0-9][0-9]|3[0-5][0-9]|36[0-4]|0[0-9]{2})'    # 0 - 364 (including leading zeros)
+rgx_match_0_to_inf: str = r'[0-9]*'
+
+
+rgx_match_minutes: str = rf'^{rgx_match_0_to_59}$'                                                                # [0-59]
+rgx_match_hours: str = rf'^{rgx_match_0_to_59}:{rgx_match_0_to_59}$'                                              # [0-59]  : [0-59]
+rgx_match_days_1: str = rf'^{rgx_match_0_to_23}:{rgx_match_0_to_59}:{rgx_match_0_to_59}$'                         # [0-23]  : [0-59] : [0-59]
+rgx_match_days_2: str = rf'^{rgx_match_0_to_inf}:{rgx_match_0_to_59}:{rgx_match_0_to_59}$'                        # [0-INF] : [0-59] : [0-59]
+rgx_match_years_1: str = rf'^{rgx_match_0_to_364}:{rgx_match_0_to_23}:{rgx_match_0_to_59}:{rgx_match_0_to_59}$'   # [0-INF] : [0-24] : [0-60] : [0-60]
+rgx_match_years_2: str = rf'^{rgx_match_0_to_inf}:{rgx_match_0_to_23}:{rgx_match_0_to_59}:{rgx_match_0_to_59}$'   # [0-INF] : [0-24] : [0-60] : [0-60]
+
+
+
+
+
 def validate_videoclip_duration(duration: str) -> bool:
-    rgx_match_0_to_59: str = r'([0-9]|[0-5][0-9])'                                  # 0 - 59  (including leading zeros)
-    rgx_match_0_to_23: str = r'([0-9]|[0-1][0-9]|2[0-3])'                           # 0 - 23  (including leading zeros)
-    rgx_match_0_to_364: str = r'([0-2][0-9][0-9]|3[0-5][0-9]|36[0-4]|0[0-9]{2})'    # 0 - 364 (including leading zeros)
-    rgx_match_0_to_inf: str = r'[0-9]*'
-
-
-    rgx_match_minutes: str = rf'^{rgx_match_0_to_59}$'                                                                # [0-59]
-    rgx_match_hours: str = rf'^{rgx_match_0_to_59}:{rgx_match_0_to_59}$'                                              # [0-59]  : [0-59]
-    rgx_match_days_1: str = rf'^{rgx_match_0_to_23}:{rgx_match_0_to_59}:{rgx_match_0_to_59}$'                         # [0-23]  : [0-59] : [0-59]
-    rgx_match_days_2: str = rf'^{rgx_match_0_to_inf}:{rgx_match_0_to_59}:{rgx_match_0_to_59}$'                        # [0-INF] : [0-59] : [0-59]
-    rgx_match_years_1: str = rf'^{rgx_match_0_to_364}:{rgx_match_0_to_23}:{rgx_match_0_to_59}:{rgx_match_0_to_59}$'   # [0-INF] : [0-24] : [0-60] : [0-60]
-    rgx_match_years_2: str = rf'^{rgx_match_0_to_inf}:{rgx_match_0_to_23}:{rgx_match_0_to_59}:{rgx_match_0_to_59}$'   # [0-INF] : [0-24] : [0-60] : [0-60]
-    
+    global rgx_match_minutes
+    global rgx_match_hours
+    global rgx_match_days_1
+    global rgx_match_days_2
+    global rgx_match_years_1
+    global rgx_match_years_2
 
     if re.match(rgx_match_minutes, duration) is not None:
         return True
@@ -901,6 +915,7 @@ def interactive_mode(check_resource_online: bool = False) -> None:
 
 
 def display_used_REGEXs():
+    # REGEXs that validate YouTube URLs
     global rgx_01_YT_video
     global rgx_02_YT_video_at_current_time
     global rgx_03_YT_watch_video
@@ -927,11 +942,30 @@ def display_used_REGEXs():
     print(f"\t-> '{rgx_11_YT_short_with_current_time_and_with_share}'")
     print(f"\t-> '{full_youtube_regex}'")
     print()
-    print(f"\tIf one of them matches the $URL,")
-    print(f"\tthe HTML code for a clickable YouTube card will be generated.")
+    print(f"\tIf none of them matches the provided URL, the program will exit forcefully, with an ERROR message.")
     print()
-    print(f"\tIf none of the above REGEX is matched, the program will exit forcefully, with an ERROR message.")
 
+    print()
+
+    # REGEXs that validate YouTube clip duration
+    global rgx_match_minutes
+    global rgx_match_hours
+    global rgx_match_days_1
+    global rgx_match_days_2
+    global rgx_match_years_1
+    global rgx_match_years_2
+    print(f"{sys.argv[0]} will match the provided DURATION (of YouTube clip) against the following REGEX-s:")
+    print(f"\t-> '{rgx_match_minutes}'")
+    print(f"\t-> '{rgx_match_hours}'")
+    print(f"\t-> '{rgx_match_days_1}'")
+    print(f"\t-> '{rgx_match_days_2}'")
+    print(f"\t-> '{rgx_match_years_1}'")
+    print(f"\t-> '{rgx_match_years_2}'")
+    print()
+    print(f"\tIf none of them matches the text of input DURATION (of the YouTube clip), the program will exit forcefully, with an ERROR message.")
+    print()
+
+  
 
 def help_option():
     print("NAME:")

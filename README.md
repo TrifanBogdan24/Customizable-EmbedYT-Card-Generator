@@ -175,7 +175,7 @@ $ html_md_youtube_card --url=$URL --title=$TITLE --first=[url|title] --align=[le
 If you want to make sure that the `URL`s are real
 and they exist online, use the `-e`/`--exists-online` **option**.
 
-> NOTE: The **flag** `-e`/`--exists-online` should be the first one passed to the script.
+> NOTE: The **flag** `-e`/`--exists-online` MUST BE the first one passed to the script.
 
 
 ```bash
@@ -194,7 +194,6 @@ $ html_md_youtube_card -e --url=$URL --title=$TITLE --first=[url|title] --align=
 
 
 
-
 ```bash
 # Checking URLs online
 $ html_md_youtube_card -e $URL
@@ -208,6 +207,96 @@ $ html_md_youtube_card --exists-online --url=$URL --title=$TITLE --align=[left|c
 $ html_md_youtube_card --exists-online --url=$URL --title=$TITLE --first=[url|title]
 $ html_md_youtube_card --exists-online --url=$URL --title=$TITLE --first=[url|title] --align=[left|center|right]
 ```
+
+
+
+# Valid values for command line options/flags
+
+- `-h`, `--help`
+  - Displays a suggestive help message (the manual of the utility).
+---
+
+- `-r`, `--rgx`, `--regex`
+  - Displays the REGEXs used to validate the input URL and the duration of the videoclip.
+---
+
+- `-i`, `--interactive`
+  - Takes input in an user-interactive mode in the command line.
+  - If the input is invalid, the user will be prompted to try again until a valid response is provided.
+  > Doesn't work with `-c`, `--comments`, `--add-comments` option.
+---
+
+- `-e`/`--exists-online`
+  > MUST BE the first one to be passed ot the script.
+  - Verifies if the URLs used for the link and thumbnail exist online.
+---
+
+
+- `-c`, `--comments`, `--add-comments`
+  - Add relevant comments in the generaed HTML/MarkDown code
+  > NOTE: This flag only works with option (`--url=`/`--title=`/`--align=`/...)!
+
+  > NOTE: This flag DOESN'T work with `-i`/`--interactive`!
+  > In **interactive mode**, the user will be specifically asked whether or not to include HTML code comments.
+
+  > NOTE: This flag DOESN'T work when just passing the URL!
+---
+
+- `--url=`
+  - This option expects a value after the **equal sign**, the URL of the YouTube clip.
+  - The URL will be matched against a set of REGEXs to validate if it is an YouTube clip or not.
+  - If none of the REGEXs are matched, the program will exit forecefully.
+  - If `-e`/`--exists-online` is specified in **CLI**, the URL will be checked online by sending **HTTP request** (if there is internet connection).
+---
+
+
+
+- `--title=`
+  - This option expects the title of the YouTube Video/Short.
+---
+
+
+- `--first=`
+  - This option expects a value, either `url` or `title`.
+  - Works only when `--title=` is specified in the **CLI**,
+  otherwise the program will exit forcefully.
+  > NOTE: By default (if the option is not specified), its value is set to `url`.
+  >
+  > Meaning that the the text of URL will be rendered above the TITLE. 
+---
+
+
+
+- `--align`
+  - This option expects a value: `left`, `center` or `right`.
+  - Control the text alignment of the URL and TITLE texts.
+  > NOTE: By default (if the option is not specified), the text alignment is set to `left`. 
+---
+
+
+
+- `--duration=`
+  - This option expects a value, the duration of the YouTube clip.
+  - The value will be matched against a set of REGEXs.
+  If none of them matches the value, the program will exit forcefully.
+---
+
+
+
+- `--file=`
+  > Writes to a specified file. 
+  - This option expects a value, the path to a **writeable file**.
+  - Instead of writing the generated HTML/MarkDown code to **stdout**,
+  and then **redirecting** or **copying** the text by yourself,
+  this flag enables **writing to the end of a specified file**.
+  - If the path is not valid, or if an error occurred while writing to the file,
+  the program will exit forcefully.
+----
+
+
+
+
+
 
 
 
