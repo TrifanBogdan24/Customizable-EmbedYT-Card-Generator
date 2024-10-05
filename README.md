@@ -15,6 +15,9 @@ This card comes with:
 
 ![img](Images/img-01.png)
 ![img](Images/img-02.png)
+![img](Images/img-03.png)
+![img](Images/img-04.png)
+![img](Images/img-05.png)
 
 
 Also see [Samples/test.pdf](Samples/test.pdf).
@@ -60,8 +63,8 @@ My goal was to create a more engaging and visually appealing way to embed YouTub
 
 When working with Markdown files, the results really shine when viewed with tools like:
 
-- 🖼️ `Markdown Preview` - great for local previews while you're editing.
-- 📄 `Markdown PDF` `+` `PDF Viewer` - perfect for exporting your Markdown into a professional-looking PDF.
+- 🖼️ [`Markdown Preview Enhanced`](https://marketplace.visualstudio.com/items?itemName=shd101wyy.markdown-preview-enhanced) - great for local previews while you're editing.
+- 📄 [`Markdown PDF`](https://marketplace.visualstudio.com/items?itemName=yzane.markdown-pdf) `+` [`PDF Viewer`](https://marketplace.visualstudio.com/items?itemName=tomoki1207.pdf) - perfect for exporting your Markdown into a professional-looking PDF.
 
 > Note: On `GitHub`, the cards won't render as beautifully
 > due to `GitHub`'s restrictions on custom HTML rendering.
@@ -209,7 +212,7 @@ $ html_md_youtube_card --exists-online --url=$URL --title=$TITLE --first=[url|ti
 
 
 
-# Code Examples
+# Code Examples (Command Line Arguments)
 
 
 
@@ -271,59 +274,117 @@ $ html_md_youtube_card --url=https://youtu.be/I4EWvMFj37g --title='Bash in 100 S
 ```
 
 
+# Code Examples (User Interactive Mode)
+
+
 
 ```bash
 $ html_md_youtube_card -i
-URL : https://youtu.be/7qd5sqazD7k
-Would you like to include the title in the card? Y/n N
+URL : https://youtu.be/AE1-W2bMVEs
+Would you like to include the title in the card? Y/n y
+Title : The Best Gnome Extensions ...
+Which to display first? Url or Title?
+Type 'url' or 'title': url
+Would you like to include the duration of the YouTube Video/Short? Y/n y
+Video duration: 9:29
+Would you like to include relevant comments in the generated HTML/MD code? Y/n N
+Which text alignment do you prefer?
+* left
+* center
+* right
+center
+Would you write the generated HTML/MD code in a file (redirect)? Y/n y
+File path: tmp.md
+```
+
+
+```bash
+$ html_md_youtube_card --interactive
+URL : https://youtu.be/AE1-W2bMVEs
+Would you like to include the title in the card? Y/n n
+Would you like to include the duration of the YouTube Video/Short? Y/n N
+Would you like to include relevant comments in the generated HTML/MD code? Y/n y
 Which text alignment do you prefer?
 * left
 * center
 * right
 left
+Would you write the generated HTML/MD code in a file (redirect)? Y/n N
 <div style="border: 1px solid #ddd; padding: 10px; max-width: 300px; position: relative; display: inline-block;">
-        <a href="https://youtu.be/7qd5sqazD7k" target="_blank" style="display: block; position: relative;">
-                <img src="https://img.youtube.com/vi/7qd5sqazD7k/hqdefault.jpg" alt="YouTube Thumbnail" style="width: 100%; display: block;">
+        <a href="https://youtu.be/AE1-W2bMVEs" target="_blank" style="display: block; position: relative;">
+                <!--  Thumbnail -->
+                <img src="https://img.youtube.com/vi/AE1-W2bMVEs/hqdefault.jpg" alt="YouTube Thumbnail" style="width: 100%; display: block;">
+                <!-- Play button in the center -->
                 <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: rgba(255, 0, 0, 0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
                         <div style="width: 0; height: 0; border-left: 15px solid white; border-top: 10px solid transparent; border-bottom: 10px solid transparent;"></div>
                 </div>
         </a>
         <div style="margin: 0 auto; width: 90%; text-align: left;">
-                <p style="margin: 10px 0;"><a href="https://youtu.be/7qd5sqazD7k" target="_blank">https://youtu.be/7qd5sqazD7k</a></p>
+                <!-- Text of URL -->
+                <p style="margin: 10px 0;"><a href="https://youtu.be/AE1-W2bMVEs" target="_blank">https://youtu.be/AE1-W2bMVEs</a></p>
         </div>
 </div>
+
 
 ```
 
 
 
 ```bash
-$ html_md_youtube_card --interactive
-URL : https://youtu.be/7qd5sqazD7k
+# After in invalid input, the program will not stop,
+# But asks the user for a new input, untill it is correct
+$ html_md_youtube_card -i
+URL : https://youtu.be/AE1-W2bMVEs
 Would you like to include the title in the card? Y/n y
-Title : BASH scripting will change your life
+Title : The Best Gnome Extensions ...
 Which to display first? Url or Title?
-Type 'url' or 'title': title
+Type 'url' or 'title': url
+Would you like to include the duration of the YouTube Video/Short? Y/n y
+Video duration: 9:92
+[ERROR] Invalid input for '--duration' (of the videoclip)!
+[ERROR] 9:92 was not validated by any REGEX!
+Video duration: 9:29
+Would you like to include relevant comments in the generated HTML/MD code? Y/n y
 Which text alignment do you prefer?
 * left
 * center
 * right
 left
-<!--  BASH scripting will change your life  -->
+Would you write the generated HTML/MD code in a file (redirect)? Y/n y
+File path: tmp.md
+```
+
+
+
+```bash
+# After in invalid input, the program will not stop,
+# But asks the user for a new input, untill it is correct
+$ html_md_youtube_card --interactive
+URL : https://youtu.be/AE1-W2bMVEs
+Would you like to include the title in the card? Y/n N
+Would you like to include the duration of the YouTube Video/Short? Y/n N
+Would you like to include relevant comments in the generated HTML/MD code? Y/n k
+[ERROR] Unrecognized response! Please type 'y' for YES and 'n' for NO: L
+[ERROR] Unrecognized response! Please type 'y' for YES and 'n' for NO: n
+Which text alignment do you prefer?
+* left
+* center
+* right
+l   
+[ERROR] Invalid input! Please type one of the above text alignments!
+left
+Would you write the generated HTML/MD code in a file (redirect)? Y/n n
 <div style="border: 1px solid #ddd; padding: 10px; max-width: 300px; position: relative; display: inline-block;">
-        <a href="https://youtu.be/7qd5sqazD7k" target="_blank" style="display: block; position: relative;">
-                <img src="https://img.youtube.com/vi/7qd5sqazD7k/hqdefault.jpg" alt="YouTube Thumbnail" style="width: 100%; display: block;">
+        <a href="https://youtu.be/AE1-W2bMVEs" target="_blank" style="display: block; position: relative;">
+                <img src="https://img.youtube.com/vi/AE1-W2bMVEs/hqdefault.jpg" alt="YouTube Thumbnail" style="width: 100%; display: block;">
                 <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: rgba(255, 0, 0, 0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
                         <div style="width: 0; height: 0; border-left: 15px solid white; border-top: 10px solid transparent; border-bottom: 10px solid transparent;"></div>
                 </div>
         </a>
         <div style="margin: 0 auto; width: 90%; text-align: left;">
-                <p style="margin: 10px 0;"><a href="https://youtu.be/7qd5sqazD7k" target="_blank">https://youtu.be/7qd5sqazD7k</a></p>
-                <hr style="border: 0; height: 1px; background: #ddd; margin: 10px 0;">
-                <p style="margin: 10px 0;"><a href="https://youtu.be/7qd5sqazD7k" target="_blank">BASH scripting will change your life</a></p>
+                <p style="margin: 10px 0;"><a href="https://youtu.be/AE1-W2bMVEs" target="_blank">https://youtu.be/AE1-W2bMVEs</a></p>
         </div>
 </div>
-
 ```
 
 

@@ -107,7 +107,7 @@ def get_id_of_youtube_url(url: str, check_resource_online: bool = False) -> str:
                     elif user_input in ['n', 'no']:
                         sys.exit(1)
                     else:
-                        print(f"[ERROR] Unrecognized response! Please type 'y' for YES and 'n' for NO!", file=sys.stderr)
+                        print(f"[ERROR] Unrecognized response! Please type 'y' for YES and 'n' for NO: ", file=sys.stderr, end='')
         except:
             pass
 
@@ -300,7 +300,7 @@ def get_first_online_youtube_url(VIDEO_ID: str) -> str:
                 elif user_input in ['n', 'no']:
                     sys.exit(1)
                 else:
-                    print(f"[ERROR] Unrecognized response! Please type 'y' for YES and 'n' for NO!", file=sys.stderr)
+                    print(f"[ERROR] Unrecognized response! Please type 'y' for YES and 'n' for NO: ", file=sys.stderr, end='')
             return thumbnail_1
     else:
         # No internet, therefore the first thumbnail URL will be returend
@@ -313,7 +313,7 @@ def get_first_online_youtube_url(VIDEO_ID: str) -> str:
                 elif user_input in ['n', 'no']:
                     sys.exit(1)
                 else:
-                    print(f"[ERROR] Unrecognized response! Please type 'y' for YES and 'n' for NO!", file=sys.stderr)
+                    print(f"[ERROR] Unrecognized response! Please type 'y' for YES and 'n' for NO: ", file=sys.stderr, end='')
         return thumbnail_1
 
 
@@ -323,7 +323,7 @@ def get_first_online_youtube_url(VIDEO_ID: str) -> str:
 
 
 
-def html_md_code_for_youtube_card(URL: str, THUMBNAIL: str, TITLE: str, DURATION: str, TEXT_ALIGNMENT: str, FIRST_TO_DISPLAY: str, ADD_COMMENTS: bool, FILE: str = 'stdout') -> None:
+def get_string_of_html_md_code_for_youtube_card(URL: str, THUMBNAIL: str, TITLE: str, DURATION: str, TEXT_ALIGNMENT: str, FIRST_TO_DISPLAY: str, ADD_COMMENTS: bool) -> str:
     """The printed text will have this format:
     Example 1:
     <div style="border: 1px solid #ddd; padding: 10px; max-width: 300px; position: relative; display: inline-block;">
@@ -417,6 +417,7 @@ def html_md_code_for_youtube_card(URL: str, THUMBNAIL: str, TITLE: str, DURATION
 
     """
 
+
     # Default options
     if TEXT_ALIGNMENT == '':
         TEXT_ALIGNMENT = 'left'
@@ -428,61 +429,85 @@ def html_md_code_for_youtube_card(URL: str, THUMBNAIL: str, TITLE: str, DURATION
     html_separation_line_for_url_and_title: str = f"<hr style=\"border: 0; height: 1px; background: #ddd; margin: 10px 0;\">"
     html_title_text: str = f"<p style=\"margin: 10px 0;\"><a href=\"{URL}\" target=\"_blank\">{TITLE}</a></p>"
 
+    output_string:str  = ''
+
     if TITLE != '':
-        print(f"<!-- {TITLE} -->")
-    print(f"<div style=\"border: 1px solid #ddd; padding: 10px; max-width: 300px; position: relative; display: inline-block;\">")
-    print(f"\t<a href=\"{URL}\" target=\"_blank\" style=\"display: block; position: relative;\">")
+        output_string += f"<!-- {TITLE} -->\n"
+    output_string += f"<div style=\"border: 1px solid #ddd; padding: 10px; max-width: 300px; position: relative; display: inline-block;\">\n"
+    output_string += f"\t<a href=\"{URL}\" target=\"_blank\" style=\"display: block; position: relative;\">\n"
     
     if ADD_COMMENTS is True:
-        print(f"\t\t<!--  Thumbnail -->")
-    print(f"\t\t<img src=\"{THUMBNAIL}\" alt=\"YouTube Thumbnail\" style=\"width: 100%; display: block;\">")
+        output_string += f"\t\t<!--  Thumbnail -->\n"
+    output_string += f"\t\t<img src=\"{THUMBNAIL}\" alt=\"YouTube Thumbnail\" style=\"width: 100%; display: block;\">\n"
     
     if ADD_COMMENTS is True:
-        print(f"\t\t<!-- Play button in the center -->")
-    print(f"\t\t<div style=\"position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: rgba(255, 0, 0, 0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center;\">")
-    print(f"\t\t\t<div style=\"width: 0; height: 0; border-left: 15px solid white; border-top: 10px solid transparent; border-bottom: 10px solid transparent;\"></div>")
-    print(f"\t\t</div>")
+        output_string += f"\t\t<!-- Play button in the center -->\n"
+    output_string += f"\t\t<div style=\"position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: rgba(255, 0, 0, 0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center;\">\n"
+    output_string += f"\t\t\t<div style=\"width: 0; height: 0; border-left: 15px solid white; border-top: 10px solid transparent; border-bottom: 10px solid transparent;\"></div>\n"
+    output_string += f"\t\t</div>\n"
     
     if DURATION != '':
         if ADD_COMMENTS is True:
-            print(f"\t\t<!-- Black rectangle with duration at bottom-right -->")
-        print(f"\t\t<div style=\"position: absolute; bottom: 8px; right: 8px; background: rgba(0, 0, 0, 0.8); color: white; padding: 2px 6px; font-size: 12px; border-radius: 3px;\">")
-        print(f"\t\t\t{DURATION}")
-        print(f"\t\t</div>")
+            output_string += f"\t\t<!-- Black rectangle with duration at bottom-right -->\n"
+        output_string += f"\t\t<div style=\"position: absolute; bottom: 8px; right: 8px; background: rgba(0, 0, 0, 0.8); color: white; padding: 2px 6px; font-size: 12px; border-radius: 3px;\">\n"
+        output_string += f"\t\t\t{DURATION}\n"
+        output_string += f"\t\t</div>\n"
 
-    print(f"\t</a>")
-    print(f"\t<div style=\"margin: 0 auto; width: 90%; text-align: {TEXT_ALIGNMENT};\">")
+    output_string += f"\t</a>\n"
+    output_string += f"\t<div style=\"margin: 0 auto; width: 90%; text-align: {TEXT_ALIGNMENT};\">\n"
 
     if TITLE == '':
         if ADD_COMMENTS is True:
-            print(f"\t\t<!-- Text of URL -->")
-        print(f"\t\t<p style=\"margin: 10px 0;\"><a href=\"{URL}\" target=\"_blank\">{URL}</a></p>")
+            output_string += f"\t\t<!-- Text of URL -->\n"
+        output_string += f"\t\t<p style=\"margin: 10px 0;\"><a href=\"{URL}\" target=\"_blank\">{URL}</a></p>\n"
     else:
         if FIRST_TO_DISPLAY == 'url' and ADD_COMMENTS is False:
-            print(f"\t\t{html_url_text}")
-            print(f"\t\t{html_separation_line_for_url_and_title}")
-            print(f"\t\t{html_title_text}")
+            output_string += f"\t\t{html_url_text}\n"
+            output_string += f"\t\t{html_separation_line_for_url_and_title}\n"
+            output_string += f"\t\t{html_title_text}\n"
         elif FIRST_TO_DISPLAY == 'title' and ADD_COMMENTS is False:
-            print(f"\t\t{html_title_text}")
-            print(f"\t\t{html_separation_line_for_url_and_title}")
-            print(f"\t\t{html_url_text}")
+            output_string += f"\t\t{html_title_text}\n"
+            output_string += f"\t\t{html_separation_line_for_url_and_title}\n"
+            output_string += f"\t\t{html_url_text}\n"
         elif FIRST_TO_DISPLAY == 'url' and ADD_COMMENTS is True:
-            print(f"\t\t<!-- Text of URL -->")
-            print(f"\t\t{html_url_text}")
-            print(f"\t\t<!-- Separation line -->")
-            print(f"\t\t{html_separation_line_for_url_and_title}")
-            print(f"\t\t<!-- Text of Title -->")
-            print(f"\t\t{html_title_text}")
+            output_string += f"\t\t<!-- Text of URL -->\n"
+            output_string += f"\t\t{html_url_text}\n"
+            output_string += f"\t\t<!-- Separation line -->\n"
+            output_string += f"\t\t{html_separation_line_for_url_and_title}\n"
+            output_string += f"\t\t<!-- Text of Title -->\n"
+            output_string += f"\t\t{html_title_text}\n"
         elif FIRST_TO_DISPLAY == 'title' and ADD_COMMENTS is True:
-            print(f"\t\t<!-- Text of Title -->")
-            print(f"\t\t{html_title_text}")
-            print(f"\t\t<!-- Separation line -->")
-            print(f"\t\t{html_separation_line_for_url_and_title}")
-            print(f"\t\t<!-- Text of URL -->")
-            print(f"\t\t{html_url_text}")
-    print(f"\t</div>")
-    print(f"</div>")
-    print()
+            output_string += f"\t\t<!-- Text of Title -->\n"
+            output_string += f"\t\t{html_title_text}\n"
+            output_string += f"\t\t<!-- Separation line -->\n"
+            output_string += f"\t\t{html_separation_line_for_url_and_title}\n"
+            output_string += f"\t\t<!-- Text of URL -->\n"
+            output_string += f"\t\t{html_url_text}\n"
+    output_string += f"\t</div>\n"
+    output_string += f"</div>\n"
+    output_string += f"\n"
+
+    return output_string
+
+
+
+
+def write_html_md_code_for_youtube_card(URL: str, THUMBNAIL: str, TITLE: str, DURATION: str, TEXT_ALIGNMENT: str, FIRST_TO_DISPLAY: str, ADD_COMMENTS: bool, FILE: str) -> str:
+    html_code: str = get_string_of_html_md_code_for_youtube_card(
+        URL, THUMBNAIL, TITLE, DURATION, TEXT_ALIGNMENT, FIRST_TO_DISPLAY, ADD_COMMENTS
+    )
+
+    if FILE == 'stdout':
+        print(html_code)
+    else:
+        try:
+            # Open the file in append mode (writting at the end of file)
+            file = open(FILE, 'a')
+            print(html_code, file=file)
+            file.close()
+        except:
+            print("[ERROR] Something wrong happened while writting the generated code to a file!", file=sys.stderr)
+            sys.exit(1)
 
 
 
@@ -506,7 +531,7 @@ def command_line_simple_url_mode(check_resource_online: bool = False) -> None:
         sys.exit(1)
 
     THUMBNAIL = get_youtube_thumbnail(VIDEO_ID, check_resource_online)
-    html_md_code_for_youtube_card(URL, THUMBNAIL, TITLE='', DURATION='', TEXT_ALIGNMENT='', FIRST_TO_DISPLAY='', ADD_COMMENTS=False)
+    write_html_md_code_for_youtube_card(URL, THUMBNAIL, TITLE='', DURATION='', TEXT_ALIGNMENT='', FIRST_TO_DISPLAY='', ADD_COMMENTS=False, FILE='stdout')
 
 
 
@@ -660,9 +685,8 @@ def command_line_argument_options_mode(check_resource_online: bool = False):
             if arg.startswith('-f='):
                 FILE = arg.removeprefix('-f=')
             elif arg.startswith('--file='):
-                FILE = arg.removeprefix('--file')
+                FILE = arg.removeprefix('--file=')
 
-            print(FILE)  # tmp.md
 
             if FILE == '':
                 print(f"[ERROR] The input (path to the file) cannot be empty!", file=sys.stderr)
@@ -670,7 +694,7 @@ def command_line_argument_options_mode(check_resource_online: bool = False):
             elif os.path.exists(FILE) is True and os.path.isfile(FILE) is False:
                 print(f"[ERROR] Path to {FILE} alread exists, and is not a file!", file=sys.stderr)
                 sys.exit(1)
-            elif os.path.exists(FILE) is True and os.access(os.path(FILE), os.R_OK) is False:
+            elif os.path.exists(FILE) is True and os.access(FILE, os.W_OK) is False:
                 print(f"[ERROR] Cannot write to {FILE}!", file=sys.stderr)
                 print(f"[ERROR] The file doesn't have write (`w--`) permission!", file=sys.stderr)
                 sys.exit(1)
@@ -699,10 +723,11 @@ def command_line_argument_options_mode(check_resource_online: bool = False):
         TEXT_ALIGNMENT = 'left'
     if FIRST_TO_DISPLAY == '':
         FIRST_TO_DISPLAY = 'url'
-    
+    if FILE == '':
+        FILE = 'stdout'
 
 
-    html_md_code_for_youtube_card(URL, THUMBNAIL, TITLE, DURATION, TEXT_ALIGNMENT, FIRST_TO_DISPLAY, ADD_COMMENTS)
+    write_html_md_code_for_youtube_card(URL, THUMBNAIL, TITLE, DURATION, TEXT_ALIGNMENT, FIRST_TO_DISPLAY, ADD_COMMENTS, FILE)
 
 
 
@@ -762,7 +787,7 @@ def interactive_mode(check_resource_online: bool = False) -> None:
     while True:
         user_input = input().strip().lower()
         if user_input not in ['y', 'yes', 'n', 'no']:
-            print(f"[ERROR] Unrecognized response! Please type 'y' for YES and 'n' for NO", file=sys.stderr)
+            print(f"[ERROR] Unrecognized response! Please type 'y' for YES and 'n' for NO: ", file=sys.stderr, end='')
         else:
             INLCUDE_TITLE = True if user_input in ['y', 'yes'] else False
             break
@@ -792,7 +817,7 @@ def interactive_mode(check_resource_online: bool = False) -> None:
             INCLUDE_DURATION = False
             break
         else:
-            print(f"[ERROR] Unrecognized response! Please type 'y' for YES and 'n' for NO", file=sys.stderr)
+            print(f"[ERROR] Unrecognized response! Please type 'y' for YES and 'n' for NO: ", file=sys.stderr, end='')
 
 
     if INCLUDE_DURATION is True:
@@ -810,7 +835,7 @@ def interactive_mode(check_resource_online: bool = False) -> None:
     while True:
         user_input = input().strip().lower()
         if user_input not in ['y', 'yes', 'n', 'no']:
-            print(f"[ERROR] Unrecognized response! Please type 'y' for YES and 'n' for NO", file=sys.stderr)
+            print(f"[ERROR] Unrecognized response! Please type 'y' for YES and 'n' for NO: ", file=sys.stderr, end='')
         else:
             ADD_COMMENTS = True if user_input in ['y', 'yes'] else False
             break
@@ -840,7 +865,7 @@ def interactive_mode(check_resource_online: bool = False) -> None:
             REDIRECT_TO_FILE = False
             break
         else:
-            print(f"[ERROR] Unrecognized response! Please type 'y' for YES and 'n' for NO", file=sys.stderr)
+            print(f"[ERROR] Unrecognized response! Please type 'y' for YES and 'n' for NO: ", file=sys.stderr, end='')
     
     if REDIRECT_TO_FILE is True:
         while True:
@@ -849,10 +874,9 @@ def interactive_mode(check_resource_online: bool = False) -> None:
 
             if FILE == '':
                 print(f"[ERROR] The input (path to the file) cannot be empty!", file=sys.stderr)
-            elif os.path.exists(FILE) and os.path.isfile(FILE):
+            elif os.path.exists(FILE) is True and os.path.isfile(FILE) is False :
                 print(f"[ERROR] Path to {FILE} alread exists, and is not a file!", file=sys.stderr)
-                sys.exit(1)
-            elif os.path.exists(FILE) is True and os.access(os.path(FILE), os.R_OK) is False:
+            elif os.path.exists(FILE) is True and os.access(FILE, os.W_OK) is False:
                 print(f"[ERROR] Cannot write to {FILE}!", file=sys.stderr)
                 print(f"[ERROR] The file doesn't have write (`w--`) permission!", file=sys.stderr)
             else:
@@ -871,7 +895,7 @@ def interactive_mode(check_resource_online: bool = False) -> None:
     if FILE == '':
         FILE = 'stdout'
 
-    html_md_code_for_youtube_card(URL, THUMBNAIL, TITLE, DURATION, TEXT_ALIGNMENT, FIRST_TO_DISPLAY, ADD_COMMENTS, FILE)
+    write_html_md_code_for_youtube_card(URL, THUMBNAIL, TITLE, DURATION, TEXT_ALIGNMENT, FIRST_TO_DISPLAY, ADD_COMMENTS, FILE)
 
 
 
