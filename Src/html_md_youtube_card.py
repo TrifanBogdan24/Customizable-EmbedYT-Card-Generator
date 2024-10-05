@@ -7,35 +7,53 @@ import sys
 
 
 
-rgx_video_id: re = r'[A-Za-z0-9-_]{11}'
-rgx_playlist_id: re = r'[A-Za-z0-9-_]{34}'
-rg_end_of_url: re = r'[\/\?]?$'
+rgx_video_id: str = r'[A-Za-z0-9-_]{11}'
+rgx_playlist_id: str = r'[A-Za-z0-9-_]{34}'
+rg_end_of_url: str = r'[\/\?]?$'
 
 
 
 
 # For 'manually' getting the VIDEO ID
 
-rgx_01_YT_video: re = r'^https://youtu.be/[A-Za-z0-9-_]{11}[\/\?]?$'
-rgx_02_YT_video_at_current_time: re = r'^https://youtu.be/[A-Za-z0-9-_]{11}\?t=[0-9]+[\/\?]?$'
-rgx_03_YT_watch_video: re = r'^https://youtu.be/watch\?v=[A-Za-z0-9-_]{11}[\/\?]?$'
+rgx_01_YT_video: str = r'^https://youtu.be/[A-Za-z0-9-_]{11}[\/\?]?$'
+rgx_02_YT_video_at_current_time: str = r'^https://youtu.be/[A-Za-z0-9-_]{11}\?t=[0-9]+[\/\?]?$'
+rgx_03_YT_watch_video: str = r'^https://youtu.be/watch\?v=[A-Za-z0-9-_]{11}[\/\?]?$'
 rgx_04_YT_watch_video_at_current_time:re = r'^https://youtu.be/watch\?v=[A-Za-z0-9-_]{11}\?t=[0-9]+[\/\?]?$'
 
-rgx_05_YT_video_from_playlist: re = r'^https://youtu.be/[A-Za-z0-9-_]{11}\?list=[A-Za-z0-9-_]{34}[\/\?]?$'
-rgx_06_YT_video_from_playlist_at_current_time: re = r'^https://youtu.be/[A-Za-z0-9-_]{11}\?list=[A-Za-z0-9-_]{34}&t=[0-9]+[\/\?]?$'
-rgx_07_YT_watch_video_from_playlist: re = r'^https://www.youtube.com/watch\?v=[A-Za-z0-9-_]{11}[\?\&]list=[A-Za-z0-9-_]{34}[\/\?]?$'
+rgx_05_YT_video_from_playlist: str = r'^https://youtu.be/[A-Za-z0-9-_]{11}\?list=[A-Za-z0-9-_]{34}[\/\?]?$'
+rgx_06_YT_video_from_playlist_at_current_time: str = r'^https://youtu.be/[A-Za-z0-9-_]{11}\?list=[A-Za-z0-9-_]{34}&t=[0-9]+[\/\?]?$'
+rgx_07_YT_watch_video_from_playlist: str = r'^https://www.youtube.com/watch\?v=[A-Za-z0-9-_]{11}[\?\&]list=[A-Za-z0-9-_]{34}[\/\?]?$'
 
-rgx_08_YT_short: re = r'^https://www.youtube.com/shorts/[A-Za-z0-9-_]{11}[\/\?]?$'
-rgx_09_YT_short_with_share: re = r'^https://www.youtube.com/shorts/[A-Za-z0-9-_]{11}\?feature=share[\/\?]?$'
-rgx_10_YT_short_with_current_time: re = r'^https://www.youtube.com/shorts/[A-Za-z0-9-_]{11}\?t=[0-10]+[\/\?]?$'
-rgx_11_YT_short_with_current_time_and_with_share: re = r'^https://www.youtube.com/shorts/[A-Za-z0-9-_]{11}\?t=[0-10]+&feature=share[\/\?]?$'
+rgx_08_YT_short: str = r'^https://www.youtube.com/shorts/[A-Za-z0-9-_]{11}[\/\?]?$'
+rgx_09_YT_short_with_share: str = r'^https://www.youtube.com/shorts/[A-Za-z0-9-_]{11}\?feature=share[\/\?]?$'
+rgx_10_YT_short_with_current_time: str = r'^https://www.youtube.com/shorts/[A-Za-z0-9-_]{11}\?t=[0-10]+[\/\?]?$'
+rgx_11_YT_short_with_current_time_and_with_share: str = r'^https://www.youtube.com/shorts/[A-Za-z0-9-_]{11}\?t=[0-10]+&feature=share[\/\?]?$'
 
 
 # Define regex patterns for different YouTube URL formats
 # regex from: regex101.com -> Community Patterns -> search youtube url
-full_youtube_regex: re = re.compile(
+full_youtube_regex = re.compile(
     r'^(?:https?://)?(?:www\.)?(?:youtube\.com/(?:[^/]+/.*/|(?:v|e(?:mbed)?|watch|shorts)/|.*[?&]v=)|youtu\.be/)([a-zA-Z0-9_-]{11})'
 )
+
+
+
+
+rgx_match_0_to_59: str = r'([0-9]|[0-5][0-9])'                              # 0 - 59  (including leading zeros)
+rgx_match_0_to_23: str = r'([0-9]|[0-1][0-9]|2[0-3])'                                 # 0 - 23  (including leading zeros)
+rgx_match_0_to_364: str = r'([0-2][0-9][0-9]|3[0-5][0-9]|36[0-4]|0[0-9]{2})'   # 0 - 364 (including leading zeros)
+rgx_match_0_to_inf: str = r'[0-9]*'
+
+
+# For each of these REGEXs, print the matching lines of 'numbers.txt'
+rgx_match_minutes: str = rf'^{rgx_match_0_to_59}$'                                                              # [0-59]
+rgx_match_hours: str = rf'^{rgx_match_0_to_59}:{rgx_match_0_to_59}$'                                            # [0-59]  : [0-59]
+rgx_match_days_1: str = rf'^{rgx_match_0_to_23}:{rgx_match_0_to_59}:{rgx_match_0_to_59}$'                       # [0-23]  : [0-59] : [0-59]
+rgx_match_days_2: str = rf'^{rgx_match_0_to_inf}:{rgx_match_0_to_59}:{rgx_match_0_to_59}$'                      # [0-INF] : [0-59] : [0-59]
+rgx_match_years: str = rf'^{rgx_match_0_to_inf}:{rgx_match_0_to_23}:{rgx_match_0_to_59}:{rgx_match_0_to_59}$'   # [0-INF] : [0-24] : [0-60] : [0-60]
+
+
 
 
 
@@ -358,11 +376,11 @@ def html_md_code_for_youtube_card(URL: str, THUMBNAIL: str, TITLE: str, DURATION
             <img src="https://img.youtube.com/vi/2JE66WFpaII/hqdefault.jpg" alt="YouTube Thumbnail" style="width: 100%; display: block;">
             <!-- Play button in the center -->
             <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: rgba(255, 0, 0, 0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                    <div style="width: 0; height: 0; border-left: 15px solid white; border-top: 10px solid transparent; border-bottom: 10px solid transparent;"></div>
+                <div style="width: 0; height: 0; border-left: 15px solid white; border-top: 10px solid transparent; border-bottom: 10px solid transparent;"></div>
             </div>
             <!-- Black rectangle with duration at bottom-right -->
             <div style="position: absolute; bottom: 8px; right: 8px; background: rgba(0, 0, 0, 0.8); color: white; padding: 2px 6px; font-size: 12px; border-radius: 3px;">
-                    22:15
+                22:15
             </div>
     </a>
         <div style="margin: 0 auto; width: 90%; text-align: left;">
