@@ -4,6 +4,7 @@ from typing import List
 import requests
 import re
 import sys
+import os
 
 
 
@@ -322,7 +323,7 @@ def get_first_online_youtube_url(VIDEO_ID: str) -> str:
 
 
 
-def html_md_code_for_youtube_card(URL: str, THUMBNAIL: str, TITLE: str, DURATION: str, TEXT_ALIGNMENT: str, FIRST_TO_DISPLAY: str, ADD_COMMENTS: bool) -> None:
+def html_md_code_for_youtube_card(URL: str, THUMBNAIL: str, TITLE: str, DURATION: str, TEXT_ALIGNMENT: str, FIRST_TO_DISPLAY: str, ADD_COMMENTS: bool, FILE: str = 'stdout') -> None:
     """The printed text will have this format:
     Example 1:
     <div style="border: 1px solid #ddd; padding: 10px; max-width: 300px; position: relative; display: inline-block;">
@@ -519,6 +520,8 @@ def command_line_argument_options_mode(check_resource_online: bool = False):
     TEXT_ALIGNMENT = ''    # 'center', 'left' or 'right'
     DURATION = ''
     ADD_COMMENTS: bool = False
+    REDIRECT_TO_FILE: bool = False
+    FILE: str = ''
 
     cmd_options: List[str] = sys.argv[2:] if check_resource_online == True else sys.argv[1:]
 
@@ -644,6 +647,35 @@ def command_line_argument_options_mode(check_resource_online: bool = False):
                 sys.exit(1)
 
             ADD_COMMENTS = True
+        
+        elif arg.startswith('-f=') or arg.startswith('--file='):
+            # Flag was already set
+            if FILE != '':
+                print(f"[ERROR] The flag '--file=' has been set before! It cannot appear twice!", file=sys.stderr)
+                print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
+                sys.exit(1)
+
+
+
+            if arg.startswith('-f='):
+                FILE = arg.removeprefix('-f=')
+            elif arg.startswith('--file='):
+                FILE = arg.removeprefix('--file')
+
+            print(FILE)  # tmp.md
+
+            if FILE == '':
+                print(f"[ERROR] The input (path to the file) cannot be empty!", file=sys.stderr)
+                sys.exit(1)
+            elif os.path.exists(FILE) is True and os.path.isfile(FILE) is False:
+                print(f"[ERROR] Path to {FILE} alread exists, and is not a file!", file=sys.stderr)
+                sys.exit(1)
+            elif os.path.exists(FILE) is True and os.access(os.path(FILE), os.R_OK) is False:
+                print(f"[ERROR] Cannot write to {FILE}!", file=sys.stderr)
+                print(f"[ERROR] The file doesn't have write (`w--`) permission!", file=sys.stderr)
+                sys.exit(1)
+            
+
         else:
             print(f"[ERROR] Invalid option {arg}!", file=sys.stderr)
             print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
@@ -708,6 +740,8 @@ def interactive_mode(check_resource_online: bool = False) -> None:
     INCLUDE_DURATION: bool = False
     DURATION: str = ''
     ADD_COMMENTS: bool = False
+    REDIRECT_TO_FILE: bool = False
+    FILE: str = ''
 
     VIDEO_ID: str = ''
 
@@ -748,7 +782,7 @@ def interactive_mode(check_resource_online: bool = False) -> None:
                 break
 
 
-    print("Would you like to include the duration of the YouTube Video/Short? Y/n", end='')
+    print("Would you like to include the duration of the YouTube Video/Short? Y/n", end=' ')
     while True:
         user_input = input().strip().lower()
         if user_input in ['y', 'yes']:
@@ -796,6 +830,36 @@ def interactive_mode(check_resource_online: bool = False) -> None:
             print("[ERROR] Invalid input! Please type one of the above text alignments!", file=sys.stderr)
 
 
+    print("Would you write the generated HTML/MD code in a file (redirect)? Y/n", end=' ')
+    while True:
+        user_input = input().strip().lower()
+        if user_input in ['y', 'yes']:
+            REDIRECT_TO_FILE = True
+            break
+        if user_input in ['n', 'no']:
+            REDIRECT_TO_FILE = False
+            break
+        else:
+            print(f"[ERROR] Unrecognized response! Please type 'y' for YES and 'n' for NO", file=sys.stderr)
+    
+    if REDIRECT_TO_FILE is True:
+        while True:
+            print("File path:", end=' ')
+            FILE = input()
+
+            if FILE == '':
+                print(f"[ERROR] The input (path to the file) cannot be empty!", file=sys.stderr)
+            elif os.path.exists(FILE) and os.path.isfile(FILE):
+                print(f"[ERROR] Path to {FILE} alread exists, and is not a file!", file=sys.stderr)
+                sys.exit(1)
+            elif os.path.exists(FILE) is True and os.access(os.path(FILE), os.R_OK) is False:
+                print(f"[ERROR] Cannot write to {FILE}!", file=sys.stderr)
+                print(f"[ERROR] The file doesn't have write (`w--`) permission!", file=sys.stderr)
+            else:
+                break
+    
+
+
     THUMBNAIL: str = get_youtube_thumbnail(VIDEO_ID, check_resource_online)
 
 
@@ -804,8 +868,10 @@ def interactive_mode(check_resource_online: bool = False) -> None:
         TEXT_ALIGNMENT = 'left'
     if FIRST_TO_DISPLAY == '':
         FIRST_TO_DISPLAY = 'url'
+    if FILE == '':
+        FILE = 'stdout'
 
-    html_md_code_for_youtube_card(URL, THUMBNAIL, TITLE, DURATION, TEXT_ALIGNMENT, FIRST_TO_DISPLAY, ADD_COMMENTS)
+    html_md_code_for_youtube_card(URL, THUMBNAIL, TITLE, DURATION, TEXT_ALIGNMENT, FIRST_TO_DISPLAY, ADD_COMMENTS, FILE)
 
 
 
