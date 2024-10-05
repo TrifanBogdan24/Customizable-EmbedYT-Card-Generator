@@ -539,6 +539,7 @@ def command_line_argument_options_mode(check_resource_online: bool = False):
 
             FIRST_TO_DISPLAY = arg.removeprefix('--first=')
 
+
             # Flag was provided with an empty value
             if FIRST_TO_DISPLAY == '':
                 print(f"ERROR: The '--first=' option expects to be specified a value!", file=sys.stderr)
@@ -546,6 +547,10 @@ def command_line_argument_options_mode(check_resource_online: bool = False):
                 print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
                 sys.exit(1)
 
+
+            if (FIRST_TO_DISPLAY.startswith('\'') and FIRST_TO_DISPLAY.endswith('\'')) \
+                or (FIRST_TO_DISPLAY.startswith('\"') and FIRST_TO_DISPLAY.endswith('\"')):
+                FIRST_TO_DISPLAY = FIRST_TO_DISPLAY[1:-1]
 
             if FIRST_TO_DISPLAY not in ['url', 'title']:
                 print(f"ERROR: Invalid value for '--first=' option!", file=sys.stderr)
@@ -568,6 +573,10 @@ def command_line_argument_options_mode(check_resource_online: bool = False):
                 print(f"Example: --first=[left|center|right]", file=sys.stderr)
                 print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
                 sys.exit(1)
+
+            if (TEXT_ALIGNMENT.startswith('\'') and TEXT_ALIGNMENT.endswith('\'')) \
+                or (TEXT_ALIGNMENT.startswith('\"') and TEXT_ALIGNMENT.endswith('\"')):
+                TEXT_ALIGNMENT = TEXT_ALIGNMENT[1:-1]
             
             # Flag is provided with an invalid value
             if TEXT_ALIGNMENT not in ['center', 'right', 'left']:
