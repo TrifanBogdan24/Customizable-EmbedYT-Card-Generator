@@ -1,5 +1,9 @@
 #!/bin/bash
 
+
+# ⚠️ WHEN RUNNING THE SCRIPT, MAKE SURE TO HAVE THE CURRENT DIRECTORY OF THE SCRIPT'S FOLDER ⚠️
+
+
 # The script doesn't work if the variable have whitespaces.
 # If so, they should be passed manually to the python script.
 URL="https://youtu.be/_PPWWRV6gbA"

@@ -284,122 +284,166 @@ def get_first_online_youtube_url(VIDEO_ID: str) -> str:
 
 
 
-def html_md_code_for_youtube_card(URL: str, THUMBNAIL: str, TEXT_ALIGNMENT: str, ) -> None:
-    # Example:
-    #
-    # <div style="border: 1px solid #ddd; padding: 10px; max-width: 300px; position: relative; display: inline-block;">
-    #     <a href="https://youtu.be/2JE66WFpaII" target="_blank" style="display: block; position: relative;">
-    #         <img src="https://img.youtube.com/vi/2JE66WFpaII/hqdefault.jpg" alt="YouTube Thumbnail" style="width: 100%; display: block;">
-    #         <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: rgba(255, 0, 0, 0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-    #             <div style="width: 0; height: 0; border-left: 15px solid white; border-top: 10px solid transparent; border-bottom: 10px solid transparent;"></div>
-    #         </div>
-    #     </a>
-    #     <div style="margin: 0 auto; width: 90%; text-align: right;">
-    #         <p style="margin: 10px 0;"><a href="https://youtu.be/2JE66WFpaII" target="_blank">https://youtu.be/2JE66WFpaII</a></p>
-    #     </div>
-    # </div>
-    print(f"<div style=\"border: 1px solid #ddd; padding: 10px; max-width: 300px; position: relative; display: inline-block;\">")
-    print(f"\t<a href=\"{URL}\" target=\"_blank\" style=\"display: block; position: relative;\">")
-    print(f"\t\t<--!  Thumbnail -->")
-    print(f"\t\t<img src=\"{THUMBNAIL}\" alt=\"YouTube Thumbnail\" style=\"width: 100%; display: block;\">")
-    print(f"\t\t<--! Play button in the center -->")
-    print(f"\t\t<div style=\"position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: rgba(255, 0, 0, 0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center;\">")
-    print(f"\t\t\t<div style=\"width: 0; height: 0; border-left: 15px solid white; border-top: 10px solid transparent; border-bottom: 10px solid transparent;\"></div>")
-    print(f"\t\t</div>")
-    print(f"\t</a>")
-    print(f"\t<div style=\"margin: 0 auto; width: 90%; text-align: {TEXT_ALIGNMENT};\">")
-    print(f"\t\t<p style=\"margin: 10px 0;\"><a href=\"{URL}\" target=\"_blank\">{URL}</a></p>")
-    print(f"\t</div>")
-    print(f"</div>")
-    print()
+def html_md_code_for_youtube_card(URL: str, THUMBNAIL: str, TITLE: str, DURATION: str, TEXT_ALIGNMENT: str, FIRST_TO_DISPLAY: str, ADD_COMMENTS: bool) -> None:
+    """The printed text will have this format:
+    Example 1:
+    <div style="border: 1px solid #ddd; padding: 10px; max-width: 300px; position: relative; display: inline-block;">
+        <a href="https://youtu.be/_PPWWRV6gbA" target="_blank" style="display: block; position: relative;">
+            <img src="https://img.youtube.com/vi/_PPWWRV6gbA/hqdefault.jpg" alt="YouTube Thumbnail" style="width: 100%; display: block;">
+            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: rgba(255, 0, 0, 0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                <div style="width: 0; height: 0; border-left: 15px solid white; border-top: 10px solid transparent; border-bottom: 10px solid transparent;"></div>
+            </div>
+        </a>
+        <div style="margin: 0 auto; width: 90%; text-align: left;">
+            <p><a href="https://youtu.be/_PPWWRV6gbA" target="_blank">Watch This: https://youtu.be/_PPWWRV6gbA</a></p>
+        </div>
+    </div>
+
+    Example 2:
+    <div style="border: 1px solid #ddd; padding: 10px; max-width: 300px; position: relative; display: inline-block;">
+        <a href="https://youtu.be/2JE66WFpaII" target="_blank" style="display: block; position: relative;">
+        <img src="https://img.youtube.com/vi/2JE66WFpaII/hqdefault.jpg" alt="YouTube Thumbnail" style="width: 100%; display: block;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: rgba(255, 0, 0, 0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+            <div style="width: 0; height: 0; border-left: 15px solid white; border-top: 10px solid transparent; border-bottom: 10px solid transparent;"></div>
+        </div>
+        </a>
+        <div style="margin: 0 auto; width: 90%; text-align: left;">
+            <p style="margin: 10px 0;"><a href="https://youtu.be/2JE66WFpaII" target="_blank">https://youtu.be/2JE66WFpaII</a></p>
+        </div>
+    </div>
 
 
+    Example 3:
+    <!--  Markdown Syntax | In One Video  -->
+    <div style="border: 1px solid #ddd; padding: 10px; max-width: 300px; position: relative; display: inline-block;">
+        <a href="https://youtu.be/2JE66WFpaII" target="_blank" style="display: block; position: relative;">
+            <img src="https://img.youtube.com/vi/2JE66WFpaII/hqdefault.jpg" alt="YouTube Thumbnail" style="width: 100%; display: block;">
+            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: rgba(255, 0, 0, 0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                <div style="width: 0; height: 0; border-left: 15px solid white; border-top: 10px solid transparent; border-bottom: 10px solid transparent;"></div>
+            </div>
+        </a>
+        <div style="margin: 0 auto; width: 90%; text-align: left;">
+            <p style="margin: 10px 0;"><a href="https://youtu.be/2JE66WFpaII" target="_blank">https://youtu.be/2JE66WFpaII</a></p>
+            <hr style="border: 0; height: 1px; background: #ddd; margin: 10px 0;">
+            <p style="margin: 10px 0;"><a href="https://youtu.be/2JE66WFpaII" target="_blank">Markdown Syntax | In One Video</a></p>
+        </div>
+    </div>
 
-def html_md_code_for_youtube_card_with_title(TITLE: str, URL: str, THUMBNAIL: str, TEXT_ALINGMENT: str, FIRST_TO_DISPLAY: str) -> None:
-    # Example:
-    # 
-    # <!--  Markdown Syntax | In One Video  -->
-    # <div style="border: 1px solid #ddd; padding: 10px; max-width: 300px; position: relative; display: inline-block;">
-    #     <a href="https://youtu.be/2JE66WFpaII" target="_blank" style="display: block; position: relative;">
-    #         <img src="https://img.youtube.com/vi/2JE66WFpaII/hqdefault.jpg" alt="YouTube Thumbnail" style="width: 100%; display: block;">
-    #         <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: rgba(255, 0, 0, 0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-    #             <div style="width: 0; height: 0; border-left: 15px solid white; border-top: 10px solid transparent; border-bottom: 10px solid transparent;"></div>
-    #         </div>
-    #     </a>
-    #     <div style="margin: 0 auto; width: 90%; text-align: left;">
-    #         <p style="margin: 10px 0;"><a href="https://youtu.be/2JE66WFpaII" target="_blank">https://youtu.be/2JE66WFpaII</a></p>
-    #         <hr style="border: 0; height: 1px; background: #ddd; margin: 10px 0;">
-    #         <p style="margin: 10px 0;"><a href="https://youtu.be/2JE66WFpaII" target="_blank">Markdown Syntax | In One Video</a></p>
-    #     </div>
-    # </div>
-    print(f"<!--  {TITLE}  -->")
-    print(f"<div style=\"border: 1px solid #ddd; padding: 10px; max-width: 300px; position: relative; display: inline-block;\">")
-    print(f"\t<a href=\"{URL}\" target=\"_blank\" style=\"display: block; position: relative;\">")
-    print(f"\t\t<--!  Thumbnail -->")
-    print(f"\t\t<img src=\"{THUMBNAIL}\" alt=\"YouTube Thumbnail\" style=\"width: 100%; display: block;\">")
-    print(f"\t\t<--! Play button in the center -->")
-    print(f"\t\t<div style=\"position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: rgba(255, 0, 0, 0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center;\">")
-    print(f"\t\t\t<div style=\"width: 0; height: 0; border-left: 15px solid white; border-top: 10px solid transparent; border-bottom: 10px solid transparent;\"></div>")
-    print(f"\t\t</div>")
-    print(f"\t</a>")
-    print(f"\t<div style=\"margin: 0 auto; width: 90%; text-align: {TEXT_ALINGMENT};\">")
+
+    Example 4:
+    <!--  Markdown Syntax | In One Video  -->
+    <div style="border: 1px solid #ddd; padding: 10px; max-width: 300px; position: relative; display: inline-block;">
+    <a href="https://youtu.be/_PPWWRV6gbA" target="_blank" style="display: block; position: relative;">
+        <img src="https://img.youtube.com/vi/2JE66WFpaII/hqdefault.jpg" alt="YouTube Thumbnail" style="width: 100%; display: block;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: rgba(255, 0, 0, 0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+            <div style="width: 0; height: 0; border-left: 15px solid white; border-top: 10px solid transparent; border-bottom: 10px solid transparent;"></div>
+        </div>
+        <div style="position: absolute; bottom: 8px; right: 8px; background: rgba(0, 0, 0, 0.8); color: white; padding: 2px 6px; font-size: 12px; border-radius: 3px;">
+            22:15
+        </div>
+    </a>
+        <div style="margin: 0 auto; width: 90%; text-align: left;">
+            <p style="margin: 10px 0;"><a href="https://youtu.be/_PPWWRV6gbA" target="_blank">https://youtu.be/_PPWWRV6gbA</a></p>
+            <hr style="border: 0; height: 1px; background: #ddd; margin: 10px 0;">
+            <p style="margin: 10px 0;"><a href="https://youtu.be/_PPWWRV6gbA" target="_blank">Markdown Syntax | In One Video</a></p>
+        </div>
+    </div>
+
+
+    Example 5:
+    <!--  Markdown Syntax | In One Video  -->
+    <div style="border: 1px solid #ddd; padding: 10px; max-width: 300px; position: relative; display: inline-block;">
+    <a href="https://youtu.be/_PPWWRV6gbA" target="_blank" style="display: block; position: relative;">
+            <!--  Thumbnail -->
+            <img src="https://img.youtube.com/vi/2JE66WFpaII/hqdefault.jpg" alt="YouTube Thumbnail" style="width: 100%; display: block;">
+            <!-- Play button in the center -->
+            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: rgba(255, 0, 0, 0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <div style="width: 0; height: 0; border-left: 15px solid white; border-top: 10px solid transparent; border-bottom: 10px solid transparent;"></div>
+            </div>
+            <!-- Black rectangle with duration at bottom-right -->
+            <div style="position: absolute; bottom: 8px; right: 8px; background: rgba(0, 0, 0, 0.8); color: white; padding: 2px 6px; font-size: 12px; border-radius: 3px;">
+                    22:15
+            </div>
+    </a>
+        <div style="margin: 0 auto; width: 90%; text-align: left;">
+            <!-- Text of URL -->
+            <p style="margin: 10px 0;"><a href="https://youtu.be/_PPWWRV6gbA" target="_blank">https://youtu.be/_PPWWRV6gbA</a></p>
+            <!-- Separation line -->
+            <hr style="border: 0; height: 1px; background: #ddd; margin: 10px 0;">
+            <!-- Text of Title -->
+            <p style="margin: 10px 0;"><a href="https://youtu.be/_PPWWRV6gbA" target="_blank">Markdown Syntax | In One Video</a></p>
+        </div>
+    </div>
+
+
+    """
+
+    # Default options
+    if TEXT_ALIGNMENT == '':
+        TEXT_ALIGNMENT = 'left'
+    if FIRST_TO_DISPLAY == '':
+        FIRST_TO_DISPLAY = 'url'
     
 
+    html_url_text: str = f"<p style=\"margin: 10px 0;\"><a href=\"{URL}\" target=\"_blank\">{URL}</a></p>"
+    html_separation_line_for_url_and_title: str = f"<hr style=\"border: 0; height: 1px; background: #ddd; margin: 10px 0;\">"
+    html_title_text: str = f"<p style=\"margin: 10px 0;\"><a href=\"{URL}\" target=\"_blank\">{TITLE}</a></p>"
 
-
-    html_code_for_url_card: str = f"\t\t<p style=\"margin: 10px 0;\"><a href=\"{URL}\" target=\"_blank\">{URL}</a></p>"
-    html_code_for_title_card: str = f"\t\t<p style=\"margin: 10px 0;\"><a href=\"{URL}\" target=\"_blank\">{TITLE}</a></p>"
-
-
-
-    if FIRST_TO_DISPLAY == 'url':
-        print(html_code_for_url_card)
-    elif FIRST_TO_DISPLAY == 'title':
-        print(html_code_for_title_card)
-
-    # Separation line
-    print(f"\t\t<hr style=\"border: 0; height: 1px; background: #ddd; margin: 10px 0;\">")
-
-
-
-
-    if FIRST_TO_DISPLAY == 'url':
-        print(html_code_for_title_card)
-    elif FIRST_TO_DISPLAY == 'title':
-        print(html_code_for_url_card)
-
-    print(f"\t</div>")
-    print(f"</div>")
-    print()
-
-
-
-def html_md_code_for_basic_youtube_card(URL: str, THUMBNAIL: str) -> None:
-    # Example:
-    #
-    # <div style="border: 1px solid #ddd; padding: 10px; max-width: 300px; position: relative; display: inline-block;">
-    #   <a href="https://www.youtube.com/shorts/Nl9pcj79byY?feature=share" target="_blank" style="display: block; position: relative;">
-    #     <img src="https://img.youtube.com/vi/Nl9pcj79byY/hqdefault.jpg" alt="YouTube Thumbnail" style="width: 100%; display: block;">
-    #     <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: rgba(255, 0, 0, 0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-    #       <div style="width: 0; height: 0; border-left: 15px solid white; border-top: 10px solid transparent; border-bottom: 10px solid transparent;"></div>
-    #     </div>
-    #   </a>
-    #   <p><a href="https://www.youtube.com/shorts/Nl9pcj79byY?feature=share" target="_blank">Watch This: https://www.youtube.com/shorts/Nl9pcj79byY?feature=share</a></p>
-    # </div>
+    if TITLE != '':
+        print(f"<!-- {TITLE} -->")
     print(f"<div style=\"border: 1px solid #ddd; padding: 10px; max-width: 300px; position: relative; display: inline-block;\">")
     print(f"\t<a href=\"{URL}\" target=\"_blank\" style=\"display: block; position: relative;\">")
-    print(f"\t\t<--!  Thumbnail -->")
+    
+    if ADD_COMMENTS is True:
+        print(f"\t\t<!--  Thumbnail -->")
     print(f"\t\t<img src=\"{THUMBNAIL}\" alt=\"YouTube Thumbnail\" style=\"width: 100%; display: block;\">")
-    print(f"\t\t<--! Play button in the center -->")
+    
+    if ADD_COMMENTS is True:
+        print(f"\t\t<!-- Play button in the center -->")
     print(f"\t\t<div style=\"position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: rgba(255, 0, 0, 0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center;\">")
     print(f"\t\t\t<div style=\"width: 0; height: 0; border-left: 15px solid white; border-top: 10px solid transparent; border-bottom: 10px solid transparent;\"></div>")
     print(f"\t\t</div>")
+    
+    if DURATION != '':
+        if ADD_COMMENTS is True:
+            print(f"\t\t<!-- Black rectangle with duration at bottom-right -->")
+        print(f"\t\t<div style=\"position: absolute; bottom: 8px; right: 8px; background: rgba(0, 0, 0, 0.8); color: white; padding: 2px 6px; font-size: 12px; border-radius: 3px;\">")
+        print(f"\t\t\t{DURATION}")
+        print(f"\t\t</div>")
+
     print(f"\t</a>")
-    print(f"\t<p><a href=\"{URL}\" target=\"_blank\">Watch This: {URL}</a></p>")
+    print(f"\t<div style=\"margin: 0 auto; width: 90%; text-align: {TEXT_ALIGNMENT};\">")
+
+    if TITLE == '':
+        if ADD_COMMENTS is True:
+            print(f"\t\t<!-- Text of URL -->")
+        print(f"\t\t<p style=\"margin: 10px 0;\"><a href=\"{URL}\" target=\"_blank\">{URL}</a></p>")
+    else:
+        if FIRST_TO_DISPLAY == 'url' and ADD_COMMENTS is False:
+            print(f"\t\t{html_url_text}")
+            print(f"\t\t{html_separation_line_for_url_and_title}")
+            print(f"\t\t{html_title_text}")
+        elif FIRST_TO_DISPLAY == 'title' and ADD_COMMENTS is False:
+            print(f"\t\t{html_title_text}")
+            print(f"\t\t{html_separation_line_for_url_and_title}")
+            print(f"\t\t{html_url_text}")
+        elif FIRST_TO_DISPLAY == 'url' and ADD_COMMENTS is True:
+            print(f"\t\t<!-- Text of URL -->")
+            print(f"\t\t{html_url_text}")
+            print(f"\t\t<!-- Separation line -->")
+            print(f"\t\t{html_separation_line_for_url_and_title}")
+            print(f"\t\t<!-- Text of Title -->")
+            print(f"\t\t{html_title_text}")
+        elif FIRST_TO_DISPLAY == 'title' and ADD_COMMENTS is True:
+            print(f"\t\t<!-- Text of Title -->")
+            print(f"\t\t{html_title_text}")
+            print(f"\t\t<!-- Separation line -->")
+            print(f"\t\t{html_separation_line_for_url_and_title}")
+            print(f"\t\t<!-- Text of URL -->")
+            print(f"\t\t{html_url_text}")
+    print(f"\t</div>")
     print(f"</div>")
     print()
-
-
 
 
 
@@ -423,7 +467,10 @@ def command_line_simple_url_mode(check_resource_online: bool = False) -> None:
         sys.exit(1)
 
     THUMBNAIL = get_youtube_thumbnail(VIDEO_ID, check_resource_online)
-    html_md_code_for_basic_youtube_card(URL, THUMBNAIL)
+    html_md_code_for_youtube_card(URL, THUMBNAIL, TITLE='', DURATION='', TEXT_ALIGNMENT='', FIRST_TO_DISPLAY='', ADD_COMMENTS=False)
+
+
+
 
 
 
@@ -431,7 +478,9 @@ def command_line_argument_options_mode(check_resource_online: bool = False):
     URL = ''
     TITLE = ''
     FIRST_TO_DISPLAY = ''  # 'url' or 'title'
-    TEXT_ALINGMENT = ''    # 'center', 'left' or 'right'
+    TEXT_ALIGNMENT = ''    # 'center', 'left' or 'right'
+    DURATION = ''
+    ADD_COMMENTS: bool = False
 
     cmd_options: List[str] = sys.argv[2:] if check_resource_online == True else sys.argv[1:]
 
@@ -488,22 +537,22 @@ def command_line_argument_options_mode(check_resource_online: bool = False):
         
         elif arg.startswith('--align='):
             # Flag already set
-            if TEXT_ALINGMENT != '':
+            if TEXT_ALIGNMENT != '':
                 print(f"ERROR: The flag '--align=' has been set before! It cannot appear twice!", file=sys.stderr)
                 print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
                 sys.exit(1)
         
-            TEXT_ALINGMENT = arg.removeprefix('--align=')
+            TEXT_ALIGNMENT = arg.removeprefix('--align=')
 
             # Flag is provided with an empty value
-            if TEXT_ALINGMENT == '':
+            if TEXT_ALIGNMENT == '':
                 print(f"ERROR: The '--align=' option expects to be specified a value!", file=sys.stderr)
                 print(f"Example: --first=[left|center|right]", file=sys.stderr)
                 print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
                 sys.exit(1)
             
             # Flag is provided with an invalid value
-            if TEXT_ALINGMENT not in ['center', 'right', 'left']:
+            if TEXT_ALIGNMENT not in ['center', 'right', 'left']:
                 print(f"ERROR: Invalid value for '--align=' option!", file=sys.stderr)
                 print(f"ERROR: Use '--align=[left|center|right]'!", file=sys.stderr)
                 print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
@@ -527,21 +576,15 @@ def command_line_argument_options_mode(check_resource_online: bool = False):
 
     THUMBNAIL = get_youtube_thumbnail(VIDEO_ID, check_resource_online)
 
+    # Default options
+    if TEXT_ALIGNMENT == '':
+        TEXT_ALIGNMENT = 'left'
+    if FIRST_TO_DISPLAY == '':
+        FIRST_TO_DISPLAY = 'url'
+    
 
-    if TITLE == '':
-        if TEXT_ALINGMENT == '':
-            html_md_code_for_youtube_card_without_title(URL, THUMBNAIL, 'center')
-        else:
-            html_md_code_for_youtube_card_without_title(URL, THUMBNAIL, TEXT_ALINGMENT)
-    else:
-        if TEXT_ALINGMENT == '' and FIRST_TO_DISPLAY == '':
-            html_md_code_for_youtube_card_with_title(TITLE, URL, THUMBNAIL, 'center', 'url')
-        elif TEXT_ALINGMENT == '' and FIRST_TO_DISPLAY != '':
-            html_md_code_for_youtube_card_with_title(TITLE, URL, THUMBNAIL, 'center', FIRST_TO_DISPLAY)
-        elif TEXT_ALINGMENT != '' and FIRST_TO_DISPLAY == '':
-            html_md_code_for_youtube_card_with_title(TITLE, URL, THUMBNAIL, TEXT_ALINGMENT, 'url')
-        elif TEXT_ALINGMENT != '' and FIRST_TO_DISPLAY != '':
-            html_md_code_for_youtube_card_with_title(TITLE, URL, THUMBNAIL, TEXT_ALINGMENT, FIRST_TO_DISPLAY)
+
+    html_md_code_for_youtube_card(URL, THUMBNAIL, TITLE, DURATION, TEXT_ALIGNMENT, FIRST_TO_DISPLAY, ADD_COMMENTS)
 
 
 
@@ -573,6 +616,9 @@ def interactive_mode(check_resource_online: bool = False) -> None:
     TITLE: str = ''
     FIRST_TO_DISPLAY: str = ''  # Title first ('title') or URL first ('url')
     TEXT_ALIGNMENT: str = ''
+    DURATION: str = ''
+    ADD_COMMENTS: bool = False
+
     VIDEO_ID: str = ''
 
     while True:
@@ -627,12 +673,15 @@ def interactive_mode(check_resource_online: bool = False) -> None:
     THUMBNAIL: str = get_youtube_thumbnail(VIDEO_ID, check_resource_online)
 
 
-    FIRST_TO_DISPLAY = 'url'
+    # Default options
+    if TEXT_ALIGNMENT == '':
+        TEXT_ALIGNMENT = 'left'
+    if FIRST_TO_DISPLAY == '':
+        FIRST_TO_DISPLAY = 'url'
 
-    if INLCUDE_TITLE is True:
-        html_md_code_for_youtube_card_with_title(TITLE, URL, THUMBNAIL, TEXT_ALIGNMENT, FIRST_TO_DISPLAY)
-    else:
-        html_md_code_for_youtube_card_without_title(URL, THUMBNAIL, TEXT_ALIGNMENT)
+    html_md_code_for_youtube_card(URL, THUMBNAIL, TITLE, DURATION, TEXT_ALIGNMENT, FIRST_TO_DISPLAY, ADD_COMMENTS)
+
+
 
 
 def display_used_REGEXs():
@@ -714,8 +763,8 @@ def help_option():
     print(f"\t\t\t* 'url' (default)")
     print(f"\t\t\t* 'title'")
     print(f"\t\tOptions for '--align=':")
-    print(f"\t\t\t* 'left'")
-    print(f"\t\t\t* 'center' (default)")
+    print(f"\t\t\t* 'left' (default)")
+    print(f"\t\t\t* 'center'")
     print(f"\t\t\t* 'right'")
     print()
     print(f"\t{sys.argv[0]} --interactive")
@@ -736,9 +785,6 @@ def help_option():
 
 
 def main():
-    # TODO: implement the `-e`, `--exists-online` flag (only by specifying this flag, online requests are made)
-
-
     if len(sys.argv) == 1:
         # html_md_youtube_card
         print(f"ERROR: The script expcets at least an argument/option!", file=sys.stderr)
