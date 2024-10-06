@@ -89,8 +89,6 @@ def validate_videoclip_duration(duration: str) -> bool:
 
 
 
-
-
 def autoget_youtube_video_info(URL: str) -> tuple[str, str]:
     # TODO: implement '--auto' flag and extend the function logic
 
@@ -969,30 +967,21 @@ def help_option():
     print()
     print(f"DESCRIPTION:")
     print(f"\t{sys.argv[0]} will match the provided URL against the following REGEX-s:")
-    global rgx_01_YT_video
-    global rgx_02_YT_video_at_current_time
-    global rgx_03_YT_watch_video
-    global rgx_04_YT_watch_video_at_current_timere
-    global rgx_05_YT_video_from_playlist
-    global rgx_06_YT_video_from_playlist_at_current_time
-    global rgx_07_YT_watch_video_from_playlist
-    global rgx_08_YT_short
-    global rgx_09_YT_short_with_share
-    global rgx_10_YT_short_with_current_time
-    global rgx_11_YT_short_with_current_time_and_with_share
-    global full_youtube_regex
-    print(f"\t-> '{rgx_01_YT_video}'")
-    print(f"\t-> '{rgx_02_YT_video_at_current_time}'")
-    print(f"\t-> '{rgx_03_YT_watch_video}'")
-    print(f"\t-> '{rgx_04_YT_watch_video_at_current_time}'")
-    print(f"\t-> '{rgx_05_YT_video_from_playlist}'")
-    print(f"\t-> '{rgx_06_YT_video_from_playlist_at_current_time}'")
-    print(f"\t-> '{rgx_07_YT_watch_video_from_playlist}'")
-    print(f"\t-> '{rgx_08_YT_short}'")
-    print(f"\t-> '{rgx_09_YT_short_with_share}'")
-    print(f"\t-> '{rgx_10_YT_short_with_current_time}'")
-    print(f"\t-> '{rgx_11_YT_short_with_current_time_and_with_share}'")
-    print(f"\t-> '{full_youtube_regex}'")
+    url_rgx_set = REGEXs_for_YouTube_URL()
+    print(f"\t-> '{url_rgx_set.rgx_01_YT_video}'")
+    print(f"\t-> '{url_rgx_set.rgx_02_YT_video_at_current_time}'")
+    print(f"\t-> '{url_rgx_set.rgx_03_YT_watch_video}'")
+    print(f"\t-> '{url_rgx_set.rgx_04_YT_watch_video_at_current_time}'")
+    print(f"\t-> '{url_rgx_set.rgx_05_YT_video_from_playlist}'")
+    print(f"\t-> '{url_rgx_set.rgx_06_YT_video_from_playlist_at_current_time}'")
+    print(f"\t-> '{url_rgx_set.rgx_07_YT_watch_video_from_playlist}'")
+    print(f"\t-> '{url_rgx_set.rgx_08_YT_short}'")
+    print(f"\t-> '{url_rgx_set.rgx_09_YT_short_with_share}'")
+    print(f"\t-> '{url_rgx_set.rgx_10_YT_short_with_current_time}'")
+    print(f"\t-> '{url_rgx_set.rgx_11_YT_short_with_current_time_and_with_share}'")
+    print(f"\t-> '{url_rgx_set.full_youtube_regex}'")
+    print()
+    print(f"\tIf none of them matches the provided URL, the program will exit forcefully, with an ERROR message.")
     print()
     print(f"\tIf one of them matches the $URL,")
     print(f"\tthe HTML code for a clickable YouTube card will be generated.")
