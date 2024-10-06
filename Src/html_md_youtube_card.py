@@ -90,14 +90,18 @@ def validate_videoclip_duration(duration: str) -> bool:
 
 
 def autoget_youtube_video_info(URL: str) -> tuple[str, str]:
-    # TODO: implement '--auto' flag and extend the function logic
-
-
+    """
+    If the online resources are located, the function will return a tuple, containing:
+    - The URL of the Thumbnail
+    - The Title of the YouTube clip
+    - The Duration of the YouTube clip
+    """
     try:
         # Create a YouTube object
         yt = YouTube(URL)
 
-        # Get the video title and duration
+        # Get YouTube clip info
+        thumbnail_url = yt.thumbnail_url
         title = yt.title
         duration = yt.length  # Duration in seconds
 
@@ -108,11 +112,20 @@ def autoget_youtube_video_info(URL: str) -> tuple[str, str]:
         minutes, seconds = divmod(remainder, 60)      # 60 seconds in a minute
         
         # Format duration as D:HH:MM:SS
-        duration_formatted = f"{days}:{hours:02}:{minutes:02}:{seconds:02}"
+        if int(days) != 0:
+            duration_formatted = f"{days}:{hours:02}:{minutes:02}:{seconds:02}"
+        elif int(hours) != 0:
+            duration_formatted = f"{hours:02}:{minutes:02}:{seconds:02}"
+        elif int(minutes) != 0:
+            duration_formatted = f"{minutes:02}:{seconds:02}"
+        else:
+            duration_formatted = f"0:{seconds:02}"
 
-        return (title, duration_formatted)
+        return (thumbnail_url, title, duration_formatted)
     except Exception as e:
-        return str(e)
+        print(f"[ERROR] Something went wrong while retrieving YouTube information!", file=sys.stderr)
+        print(f"[ERROR] {e}", file=sys.stderr)
+        sys.exit(1)
 
 
 
@@ -570,7 +583,6 @@ def command_line_argument_options_mode(check_resource_online: bool = False):
     TEXT_ALIGNMENT = ''    # 'center', 'left' or 'right'
     DURATION = ''
     ADD_COMMENTS: bool = False
-    REDIRECT_TO_FILE: bool = False
     FILE: str = ''
 
     cmd_options: List[str] = sys.argv[2:] if check_resource_online == True else sys.argv[1:]
@@ -753,6 +765,175 @@ def command_line_argument_options_mode(check_resource_online: bool = False):
 
 
     write_html_md_code_for_youtube_card(URL, THUMBNAIL, TITLE, DURATION, TEXT_ALIGNMENT, FIRST_TO_DISPLAY, ADD_COMMENTS, FILE)
+
+
+
+
+
+def auto_flag_command_line_argument_options_mode():
+    """
+    Allowed flags that work with '--auto': '--url=', '--first', '--align', '--add-comments', '--file='
+    """
+    if len(sys.argv) == 2 and sys.argv[1] == '--auto':
+        # html_md_youtube_card -e
+        print(f"[ERROR] Invalid usage of '--auto' flag!", file=sys.stderr)
+        print(f"[ERROR] This option cannot be used alone!", file=sys.stderr)
+        print(f"[ERROR] You must provide an URL/other options", file=sys.stderr)
+        sys.exit(1)
+
+    URL = ''
+    FIRST_TO_DISPLAY = ''  # 'url' or 'title'
+    TEXT_ALIGNMENT = ''    # 'center', 'left' or 'right'
+    ADD_COMMENTS: bool = False
+    FILE: str = ''
+
+
+    for arg in sys.argv[2:]:
+        if arg.startswith('--url='):
+            if URL != '':
+                print(f"[ERROR] The flag '--url=' has been set before! It cannot appear twice!", file=sys.stderr)
+                print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
+                sys.exit(1)
+            
+            if arg.removeprefix('--url=') == '':
+                print(f"[ERROR] The '--url=' option expects to be specified a value!", file=sys.stderr)
+                print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
+                sys.exit(1)
+            
+            URL = arg.removeprefix('--url=')
+
+        elif arg.startswith('--align='):
+            # Flag already set
+            if TEXT_ALIGNMENT != '':
+                print(f"[ERROR] The flag '--align=' has been set before! It cannot appear twice!", file=sys.stderr)
+                print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
+                sys.exit(1)
+        
+            TEXT_ALIGNMENT = arg.removeprefix('--align=')
+
+            # Removing trailing apostrophes/quotation marks
+            if (TEXT_ALIGNMENT.startswith('\'') and TEXT_ALIGNMENT.endswith('\'')) \
+                or (TEXT_ALIGNMENT.startswith('\"') and TEXT_ALIGNMENT.endswith('\"')):
+                TEXT_ALIGNMENT = TEXT_ALIGNMENT[1:-1]
+
+            # Flag is provided with an empty value
+            if TEXT_ALIGNMENT == '':
+                print(f"[ERROR] The '--align=' option expects to be specified a value!", file=sys.stderr)
+                print(f"Example: --first=[left|center|right]", file=sys.stderr)
+                print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
+                sys.exit(1)
+
+            
+            # Flag is provided with an invalid value
+            if TEXT_ALIGNMENT not in ['center', 'right', 'left']:
+                print(f"[ERROR] Invalid value for '--align=' option!", file=sys.stderr)
+                print(f"[ERROR] Use '--align=[left|center|right]'!", file=sys.stderr)
+                print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
+                sys.exit(1)
+        
+
+        elif arg.startswith('--first='):
+            # Flag was already set
+            if FIRST_TO_DISPLAY != '':
+                print(f"[ERROR] The flag '--first=' has been set before! It cannot appear twice!", file=sys.stderr)
+                print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
+                sys.exit(1)
+            
+
+            FIRST_TO_DISPLAY = arg.removeprefix('--first=')
+
+
+            # Removing trailing apostrophes/quotation marks
+            if (FIRST_TO_DISPLAY.startswith('\'') and FIRST_TO_DISPLAY.endswith('\'')) \
+                or (FIRST_TO_DISPLAY.startswith('\"') and FIRST_TO_DISPLAY.endswith('\"')):
+                FIRST_TO_DISPLAY = FIRST_TO_DISPLAY[1:-1]
+            
+            # Flag was provided with an empty value
+            if FIRST_TO_DISPLAY == '':
+                print(f"[ERROR] The '--first=' option expects to be specified a value!", file=sys.stderr)
+                print(f"Example: --first=[url|title]", file=sys.stderr)
+                print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
+                sys.exit(1)
+
+
+            if FIRST_TO_DISPLAY not in ['url', 'title']:
+                print(f"[ERROR] Invalid value for '--first=' option!", file=sys.stderr)
+                print(f"[ERROR] Use '--first=[url|title]'!", file=sys.stderr)
+                print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
+                sys.exit(1)
+
+
+        elif arg.startswith('-f=') or arg.startswith('--file='):
+            # Flag was already set
+            if FILE != '':
+                print(f"[ERROR] The flag '--file=' has been set before! It cannot appear twice!", file=sys.stderr)
+                print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
+                sys.exit(1)
+
+
+            if arg.startswith('-f='):
+                FILE = arg.removeprefix('-f=')
+            elif arg.startswith('--file='):
+                FILE = arg.removeprefix('--file=')
+
+
+            if FILE == '':
+                print(f"[ERROR] The input (path to the file) cannot be empty!", file=sys.stderr)
+                sys.exit(1)
+            elif os.path.exists(FILE) is True and os.path.isfile(FILE) is False:
+                print(f"[ERROR] Path to {FILE} alread exists, and is not a file!", file=sys.stderr)
+                sys.exit(1)
+            elif os.path.exists(FILE) is True and os.access(FILE, os.W_OK) is False:
+                print(f"[ERROR] Cannot write to {FILE}!", file=sys.stderr)
+                print(f"[ERROR] The file doesn't have write (`w--`) permission!", file=sys.stderr)
+                sys.exit(1)
+
+        elif arg in ['-c', '--comments', '--add-comments']:
+            # Flag was already set
+            if ADD_COMMENTS is True:
+                print(f"[ERROR] The option for COMMENTS has been set before! It cannot appear twice!", file=sys.stderr)
+                print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
+                sys.exit(1)
+
+            ADD_COMMENTS = True
+        
+        elif arg.startswith('-f=') or arg.startswith('--file='):
+            # Flag was already set
+            if FILE != '':
+                print(f"[ERROR] The flag '--file=' has been set before! It cannot appear twice!", file=sys.stderr)
+                print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
+                sys.exit(1)
+
+
+        elif arg.startswith('--title='):
+            print(f"[ERROR] The options '--auto' and '--title=' don't work together. '--auto'", file=sys.stderr)
+            print(f"'--auto' -> automatically fetches YouTube info (including the title)", file=sys.stderr)
+            print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
+            sys.exit(1)
+        
+        elif arg.startswith('--duration='):
+            print(f"[ERROR] The options '--auto' and '--duration=' don't work together. '--auto'", file=sys.stderr)
+            print(f"'--auto' -> automatically fetches YouTube info (including the duration)", file=sys.stderr)
+            print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
+            sys.exit(1)
+
+        else:
+            print(f"[ERROR] Invalid option {arg}!", file=sys.stderr)
+            print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
+            sys.exit(1)
+
+    (THUMBNAIL, TITLE, DURATION) = autoget_youtube_video_info(URL)
+
+    # Default options
+    if TEXT_ALIGNMENT == '':
+        TEXT_ALIGNMENT = 'left'
+    if FIRST_TO_DISPLAY == '':
+        FIRST_TO_DISPLAY = 'url'
+    if FILE == '':
+        FILE = 'stdout'
+
+    write_html_md_code_for_youtube_card(URL, THUMBNAIL, TITLE, DURATION, TEXT_ALIGNMENT, FIRST_TO_DISPLAY, ADD_COMMENTS, FILE)
+
 
 
 
@@ -1041,6 +1222,12 @@ def main():
         print(f"[ERROR] This option cannot be used alone!", file=sys.stderr)
         print(f"[ERROR] You must provide an URL/other options", file=sys.stderr)
         sys.exit(1)
+    elif len(sys.argv) == 2 and sys.argv[1] == '--auto':
+        # html_md_youtube_card -e
+        print(f"[ERROR] Invalid usage of '--auto' flag!", file=sys.stderr)
+        print(f"[ERROR] This option cannot be used alone!", file=sys.stderr)
+        print(f"[ERROR] You must provide an URL/other options", file=sys.stderr)
+        sys.exit(1)
     elif len(sys.argv) == 2 and sys.argv[1] in ['-i', '--interactive']:
         # html_md_youtube_card -i
         interactive_mode(check_resource_online=False)
@@ -1056,7 +1243,13 @@ def main():
         for arg in sys.argv[2:]:
             if arg in ['-e', '--exists-online']:
                 print(f"[ERROR] Invalid flag position!", file=sys.stderr)
-                print(f"[ERROR] The option '--exists-online' must be specified right after the script name.", file=sys.stderr)
+                print(f"[ERROR] The option '--exists-online' must be the first one to be specified right after the script name.", file=sys.stderr)
+                print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
+                sys.exit(1)
+            
+            elif arg == '--auto':
+                print(f"[ERROR] Invalid flag position!", file=sys.stderr)
+                print(f"[ERROR] The option '--auto' must be the first one to be specified right after the script name.", file=sys.stderr)
                 print(f"Please run '{sys.argv[0]} -h' to see the available options.", file=sys.stderr)
                 sys.exit(1)
 
@@ -1076,6 +1269,15 @@ def main():
                     command_line_simple_url_mode(check_resource_online=True)
             else:
                 command_line_argument_options_mode(check_resource_online=True)
+        
+        elif sys.argv[1] == '--auto':
+            if len(sys.argv) == 3 and sys.argv[2].startswith('--url=') is False:
+                URL = sys.argv[2]
+                (THUMBNAIL, TITLE, DURATION) = autoget_youtube_video_info(URL)
+                write_html_md_code_for_youtube_card(URL, THUMBNAIL, TITLE, DURATION, TEXT_ALIGNMENT='left', FIRST_TO_DISPLAY='url', ADD_COMMENTS=False, FILE='stdout')
+            else:
+                # Allowed flags that work with '--auto': '--url=', '--first', '--align', '--file='
+                auto_flag_command_line_argument_options_mode()
         else:
             check_resource_online: bool = False
 
