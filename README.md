@@ -1,4 +1,4 @@
-# Embed YouTube Card Generator
+# Customizable Embed YouTube Card Generator
 
 🚀 Glow up your HTML/Markdown files with this simple Python script!
 Just provide a YouTube URL as input, and it generates a sleek, clickable YouTube card for you.
@@ -278,7 +278,7 @@ $ html_md_youtube_card --exists-online --url=$URL --title=$TITLE --first=[url|ti
 
 
 
-- `--align`
+- `--align=`
   - This option expects a value: `left`, `center` or `right`.
   - Control the text alignment of the URL and TITLE texts.
   > NOTE: By default (if the option is not specified), the text alignment is set to `left`. 
