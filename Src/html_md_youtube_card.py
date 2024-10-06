@@ -1207,7 +1207,7 @@ def help_option():
     print(f"\t-r, --rgx, --regex     Print the REGEXs used to validate the provided (input) URL.")
     print(f"\t-h, --help             Display this help text and exit")
     print()
-    print("See more info at project home page: https://github.com/TrifanBogdan24/EmbedYT-Card-Generator.git")
+    print("See more info at project home page: https://github.com/TrifanBogdan24/Customizable-EmbedYT-Card-Generator.git")
     print()
 
 
