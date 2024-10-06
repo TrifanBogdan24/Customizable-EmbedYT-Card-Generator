@@ -302,11 +302,32 @@ $ html_md_youtube_card --exists-online --url=$URL --title=$TITLE --first=[url|ti
   this flag enables **writing to the end of a specified file**.
   - If the path is not valid, or if an error occurred while writing to the file,
   the program will exit forcefully.
-----
+---
 
 
 
+- `--auto`
+  > MUST BE the first one to be passed ot the script.
+  - Simplifies the process of creating the YouTube card
+  by automatically fechting clip's information, based on the provided **URL**.
+  - It will retrieve from **online**: the thumbnail's URL, the title and the duration.
+  - You don't have to specify the values of **TITLE** and **DURATION** anymore.
+  - It uses **standardized algorithm** to get this information, using `YouTube` from `pytube` module (`from pytube import YouTube`).
+  - The result is more **accurate** when using `--auto` flag.
+  - It needs **internet connection**. 
+  > You don't need internet connection when you don't use this flag.
 
+  > This flag doesn't work with `--title=`, `--duration=` or `--exists-online`.
+
+  > This flag doesn't work when specifying `--interactive` mode.
+
+  > This flag works only with:
+  > - `--url=`
+  > - `--first=`
+  > - `--align=`
+  > - `--file=`
+  > - `--add-comments`
+---
 
 
 
