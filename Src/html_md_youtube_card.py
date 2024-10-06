@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from typing import List
+from pytube import YouTube
 import requests
 import re
 import sys
@@ -8,79 +9,78 @@ import os
 
 
 
-rgx_video_id: str = r'[A-Za-z0-9-_]{11}'
-rgx_playlist_id: str = r'[A-Za-z0-9-_]{34}'
-rg_end_of_url: str = r'[\/\?]?$'
 
 
-# REGEXs for URL
+class REGEXs_for_YouTube_URL:
+    def __init__(self):
+        # REGEXs for URL
 
-# For 'manually' getting the VIDEO ID
+        self.rgx_video_id: str = r'[A-Za-z0-9-_]{11}'
+        self.rgx_playlist_id: str = r'[A-Za-z0-9-_]{34}'
+        self.rg_end_of_url: str = r'[\/\?]?$'
 
-rgx_01_YT_video: str = r'^https://youtu.be/[A-Za-z0-9-_]{11}[\/\?]?$'
-rgx_02_YT_video_at_current_time: str = r'^https://youtu.be/[A-Za-z0-9-_]{11}\?t=[0-9]+[\/\?]?$'
-rgx_03_YT_watch_video: str = r'^https://youtu.be/watch\?v=[A-Za-z0-9-_]{11}[\/\?]?$'
-rgx_04_YT_watch_video_at_current_time:re = r'^https://youtu.be/watch\?v=[A-Za-z0-9-_]{11}\?t=[0-9]+[\/\?]?$'
+        # For 'manually' getting the VIDEO ID
+        self.rgx_01_YT_video: str = r'^https://youtu.be/[A-Za-z0-9-_]{11}[\/\?]?$'
+        self.rgx_02_YT_video_at_current_time: str = r'^https://youtu.be/[A-Za-z0-9-_]{11}\?t=[0-9]+[\/\?]?$'
+        self.rgx_03_YT_watch_video: str = r'^https://youtu.be/watch\?v=[A-Za-z0-9-_]{11}[\/\?]?$'
+        self.rgx_04_YT_watch_video_at_current_time:re = r'^https://youtu.be/watch\?v=[A-Za-z0-9-_]{11}\?t=[0-9]+[\/\?]?$'
 
-rgx_05_YT_video_from_playlist: str = r'^https://youtu.be/[A-Za-z0-9-_]{11}\?list=[A-Za-z0-9-_]{34}[\/\?]?$'
-rgx_06_YT_video_from_playlist_at_current_time: str = r'^https://youtu.be/[A-Za-z0-9-_]{11}\?list=[A-Za-z0-9-_]{34}&t=[0-9]+[\/\?]?$'
-rgx_07_YT_watch_video_from_playlist: str = r'^https://www.youtube.com/watch\?v=[A-Za-z0-9-_]{11}[\?\&]list=[A-Za-z0-9-_]{34}[\/\?]?$'
+        self.rgx_05_YT_video_from_playlist: str = r'^https://youtu.be/[A-Za-z0-9-_]{11}\?list=[A-Za-z0-9-_]{34}[\/\?]?$'
+        self.rgx_06_YT_video_from_playlist_at_current_time: str = r'^https://youtu.be/[A-Za-z0-9-_]{11}\?list=[A-Za-z0-9-_]{34}&t=[0-9]+[\/\?]?$'
+        self.rgx_07_YT_watch_video_from_playlist: str = r'^https://www.youtube.com/watch\?v=[A-Za-z0-9-_]{11}[\?\&]list=[A-Za-z0-9-_]{34}[\/\?]?$'
 
-rgx_08_YT_short: str = r'^https://www.youtube.com/shorts/[A-Za-z0-9-_]{11}[\/\?]?$'
-rgx_09_YT_short_with_share: str = r'^https://www.youtube.com/shorts/[A-Za-z0-9-_]{11}\?feature=share[\/\?]?$'
-rgx_10_YT_short_with_current_time: str = r'^https://www.youtube.com/shorts/[A-Za-z0-9-_]{11}\?t=[0-10]+[\/\?]?$'
-rgx_11_YT_short_with_current_time_and_with_share: str = r'^https://www.youtube.com/shorts/[A-Za-z0-9-_]{11}\?t=[0-10]+&feature=share[\/\?]?$'
-
-
-# Define regex patterns for different YouTube URL formats
-# regex from: regex101.com -> Community Patterns -> search youtube url
-full_youtube_regex = re.compile(
-    r'^(?:https?://)?(?:www\.)?(?:youtube\.com/(?:[^/]+/.*/|(?:v|e(?:mbed)?|watch|shorts)/|.*[?&]v=)|youtu\.be/)([a-zA-Z0-9_-]{11})'
-)
+        self.rgx_08_YT_short: str = r'^https://www.youtube.com/shorts/[A-Za-z0-9-_]{11}[\/\?]?$'
+        self.rgx_09_YT_short_with_share: str = r'^https://www.youtube.com/shorts/[A-Za-z0-9-_]{11}\?feature=share[\/\?]?$'
+        self.rgx_10_YT_short_with_current_time: str = r'^https://www.youtube.com/shorts/[A-Za-z0-9-_]{11}\?t=[0-10]+[\/\?]?$'
+        self.rgx_11_YT_short_with_current_time_and_with_share: str = r'^https://www.youtube.com/shorts/[A-Za-z0-9-_]{11}\?t=[0-10]+&feature=share[\/\?]?$'
 
 
+        # Define regex patterns for different YouTube URL formats
+        # regex from: regex101.com -> Community Patterns -> search youtube url
+        self.full_youtube_regex = re.compile(
+            r'^(?:https?://)?(?:www\.)?(?:youtube\.com/(?:[^/]+/.*/|(?:v|e(?:mbed)?|watch|shorts)/|.*[?&]v=)|youtu\.be/)([a-zA-Z0-9_-]{11})'
+        )
 
 
 
-# REGEXs for duration
 
 
-rgx_match_0_to_59: str = r'([0-9]|[0-5][0-9])'                                  # 0 - 59  (including leading zeros)
-rgx_match_0_to_23: str = r'([0-9]|[0-1][0-9]|2[0-3])'                           # 0 - 23  (including leading zeros)
-rgx_match_0_to_364: str = r'([0-2][0-9][0-9]|3[0-5][0-9]|36[0-4]|0[0-9]{2})'    # 0 - 364 (including leading zeros)
-rgx_match_0_to_inf: str = r'[0-9]*'
+
+class REGEXs_for_duration:
+    def __init__(self):
+
+        # REGEXs for duration
+
+        # `self.__val` -> private attribute
+        self.__rgx_match_0_to_59: str = r'([0-9]|[0-5][0-9])'                                  # 0 - 59  (including leading zeros)
+        self.__rgx_match_0_to_23: str = r'([0-9]|[0-1][0-9]|2[0-3])'                           # 0 - 23  (including leading zeros)
+        self.__rgx_match_0_to_364: str = r'([0-2][0-9][0-9]|3[0-5][0-9]|36[0-4]|0[0-9]{2})'    # 0 - 364 (including leading zeros)
+        self.__rgx_match_0_to_inf: str = r'[0-9]*'                                             # 0 - INF (including leading zeros)
 
 
-rgx_match_minutes: str = rf'^{rgx_match_0_to_59}$'                                                                # [0-59]
-rgx_match_hours: str = rf'^{rgx_match_0_to_59}:{rgx_match_0_to_59}$'                                              # [0-59]  : [0-59]
-rgx_match_days_1: str = rf'^{rgx_match_0_to_23}:{rgx_match_0_to_59}:{rgx_match_0_to_59}$'                         # [0-23]  : [0-59] : [0-59]
-rgx_match_days_2: str = rf'^{rgx_match_0_to_inf}:{rgx_match_0_to_59}:{rgx_match_0_to_59}$'                        # [0-INF] : [0-59] : [0-59]
-rgx_match_years_1: str = rf'^{rgx_match_0_to_364}:{rgx_match_0_to_23}:{rgx_match_0_to_59}:{rgx_match_0_to_59}$'   # [0-INF] : [0-24] : [0-60] : [0-60]
-rgx_match_years_2: str = rf'^{rgx_match_0_to_inf}:{rgx_match_0_to_23}:{rgx_match_0_to_59}:{rgx_match_0_to_59}$'   # [0-INF] : [0-24] : [0-60] : [0-60]
+        self.rgx_match_seconds: str = rf'^{self.__rgx_match_0_to_59}$'                                                                                                               # [0-59]
+        self.rgx_match_minutes: str = rf'^{self.__rgx_match_0_to_59}:{self.__rgx_match_0_to_59}$'                                                                                    # [0-59]  : [0-59]
+        self.rgx_match_hours: str = rf'^{self.__rgx_match_0_to_23}:{self.__rgx_match_0_to_59}:{self.__rgx_match_0_to_59}$'                                                           # [0-23]  : [0-59]  : [0-59]
+        self.rgx_match_days: str = rf'^{self.__rgx_match_0_to_inf}:{self.__rgx_match_0_to_23}:{self.__rgx_match_0_to_59}:{self.__rgx_match_0_to_59}$'                                # [0-INF] : [0-23]  : [0-59] : [0-59]
+        self.rgx_match_years: str = rf'^{self.__rgx_match_0_to_inf}:{self.__rgx_match_0_to_364}:{self.__rgx_match_0_to_23}:{self.__rgx_match_0_to_59}:{self.__rgx_match_0_to_59}$'   # [0-INF] : [0-364] : [0-23] : [0-59] : [0-59]
 
 
 
 
 
 def validate_videoclip_duration(duration: str) -> bool:
-    global rgx_match_minutes
-    global rgx_match_hours
-    global rgx_match_days_1
-    global rgx_match_days_2
-    global rgx_match_years_1
-    global rgx_match_years_2
+    rgx_set = REGEXs_for_duration()
 
-    if re.match(rgx_match_minutes, duration) is not None:
+
+    if re.match(rgx_set.rgx_match_seconds, duration) is not None:
         return True
-    if re.match(rgx_match_hours, duration) is not None:
+    if re.match(rgx_set.rgx_match_minutes, duration) is not None:
         return True
-    if re.match(rgx_match_days_1, duration) is not None:
+    if re.match(rgx_set.rgx_match_hours, duration) is not None:
         return True
-    if re.match(rgx_match_days_2, duration) is not None:
+    if re.match(rgx_set.rgx_match_days, duration) is not None:
         return True
-    if re.match(rgx_match_years_1, duration) is not None:
-        return True
-    if re.match(rgx_match_years_2, duration) is not None:
+    if re.match(rgx_set.rgx_match_years, duration) is not None:
         return True
 
     # The duration of the videclip was not valided by the REGEXs
@@ -90,6 +90,31 @@ def validate_videoclip_duration(duration: str) -> bool:
 
 
 
+
+def autoget_youtube_video_info(URL: str) -> tuple[str, str]:
+    # TODO: implement '--auto' flag and extend the function logic
+
+
+    try:
+        # Create a YouTube object
+        yt = YouTube(URL)
+
+        # Get the video title and duration
+        title = yt.title
+        duration = yt.length  # Duration in seconds
+
+        # Convert duration to a more readable format (D:HH:MM:SS)
+        # Calculate days, hours, minutes, and seconds
+        days, remainder = divmod(duration, 24*3600)   # 24*3600 seconds in a day
+        hours, remainder = divmod(remainder, 3600)    # 3600 seconds in an hour
+        minutes, seconds = divmod(remainder, 60)      # 60 seconds in a minute
+        
+        # Format duration as D:HH:MM:SS
+        duration_formatted = f"{days}:{hours:02}:{minutes:02}:{seconds:02}"
+
+        return (title, duration_formatted)
+    except Exception as e:
+        return str(e)
 
 
 
@@ -126,53 +151,41 @@ def get_id_of_youtube_url(url: str, check_resource_online: bool = False) -> str:
             pass
 
 
-
-    global rgx_01_YT_video
-    global rgx_02_YT_video_at_current_time
-    global rgx_03_YT_watch_video
-    global rgx_04_YT_watch_video_at_current_timere
-    global rgx_05_YT_video_from_playlist
-    global rgx_06_YT_video_from_playlist_at_current_time
-    global rgx_07_YT_watch_video_from_playlist
-    global rgx_08_YT_short
-    global rgx_09_YT_short_with_share
-    global rgx_10_YT_short_with_current_time
-    global rgx_11_YT_short_with_current_time_and_with_share
-    global full_youtube_regex
+    rgx_set = REGEXs_for_YouTube_URL()
 
 
     if url.endswith('?') or url.endswith('/'):
         url = url[:-1]
 
-    if re.match(rgx_01_YT_video, url) is not None:
+    if re.match(rgx_set.rgx_01_YT_video, url) is not None:
         video_id: str = url.removeprefix('https://youtu.be/')
         return video_id
     
-    elif re.match(rgx_02_YT_video_at_current_time, url) is not None:
+    elif re.match(rgx_set.rgx_02_YT_video_at_current_time, url) is not None:
         while is_digit(url[-1]):
             url = url[:-1]
         url = url.removesuffix("?t=")
         video_id: str = url.removeprefix('https://youtu.be/')
         return video_id
 
-    elif re.match(rgx_03_YT_watch_video, url) is not None:
+    elif re.match(rgx_set.rgx_03_YT_watch_video, url) is not None:
         video_id: str = url.removeprefix('https://www.youtube.com/watch?v=')
         return video_id
 
-    elif re.match(rgx_04_YT_watch_video_at_current_time, url) is not None:
+    elif re.match(rgx_set.rgx_04_YT_watch_video_at_current_time, url) is not None:
         while not is_digit(url[-1]):
             url = url[:-1]
         url = url.removesuffix("?t=")
         video_id: str = url.removeprefix('https://www.youtube.com/watch?v=')
         return video_id
     
-    elif re.match(rgx_05_YT_video_from_playlist, url) is not None:
+    elif re.match(rgx_set.rgx_05_YT_video_from_playlist, url) is not None:
         url = url[:-34]    # Removing the playlist ID (fixed length of 34)
         url = url[:-len("?list=")]
         video_id: str = url.removeprefix('https://youtu.be/')
         return video_id
 
-    elif re.match(rgx_06_YT_video_from_playlist_at_current_time, url) is not None:
+    elif re.match(rgx_set.rgx_06_YT_video_from_playlist_at_current_time, url) is not None:
         while is_digit(url[-1]):
             url = url[:-1]
         url = url.removesuffix("&t=")
@@ -181,7 +194,7 @@ def get_id_of_youtube_url(url: str, check_resource_online: bool = False) -> str:
         video_id: str = url.removeprefix('https://youtu.be/')
         return video_id
     
-    elif re.match(rgx_07_YT_watch_video_from_playlist, url) is not None:
+    elif re.match(rgx_set.rgx_07_YT_watch_video_from_playlist, url) is not None:
         url = url[:-34]    # Removing the playlist ID (fixed length of 34)
         url = url[:-len("list=")]
         if url.endswith('?') or url.endswith('&'):
@@ -189,23 +202,23 @@ def get_id_of_youtube_url(url: str, check_resource_online: bool = False) -> str:
         video_id: str = url.removeprefix('https://www.youtube.com/watch?v=')
         return video_id
 
-    elif re.match(rgx_08_YT_short, url) is not None:
+    elif re.match(rgx_set.rgx_08_YT_short, url) is not None:
         video_id: str = url.removeprefix('https://www.youtube.com/shorts/')
         return video_id
 
-    elif re.match(rgx_09_YT_short_with_share, url) is not None:
+    elif re.match(rgx_set.rgx_09_YT_short_with_share, url) is not None:
         url = url.removesuffix('?feature=share')
         video_id: str = url.removeprefix('https://www.youtube.com/shorts/')
         return video_id
     
-    elif re.match(rgx_10_YT_short_with_current_time, url) is not None:
+    elif re.match(rgx_set.rgx_10_YT_short_with_current_time, url) is not None:
         while is_digit(url[-1]):
             url = url[:-1]
         url = url.removesuffix("?t=")
         video_id: str = url.removeprefix("https://www.youtube.com/shorts/")
         return video_id
 
-    elif re.match(rgx_11_YT_short_with_current_time_and_with_share, url) is not None:
+    elif re.match(rgx_set.rgx_11_YT_short_with_current_time_and_with_share, url) is not None:
         url = url.removeprefix("&feature=share")
         while is_digit(url[-1]):
             url = url[:-1]
@@ -215,7 +228,7 @@ def get_id_of_youtube_url(url: str, check_resource_online: bool = False) -> str:
 
     else:
         # Use full YouTube Regex (more complicated, but covers more URLs)
-        match = full_youtube_regex.match(url)
+        match = rgx_set.full_youtube_regex.match(url)
         if match:
             return match.group(1)  # Return the video ID
 
@@ -916,31 +929,20 @@ def interactive_mode(check_resource_online: bool = False) -> None:
 
 def display_used_REGEXs():
     # REGEXs that validate YouTube URLs
-    global rgx_01_YT_video
-    global rgx_02_YT_video_at_current_time
-    global rgx_03_YT_watch_video
-    global rgx_04_YT_watch_video_at_current_timere
-    global rgx_05_YT_video_from_playlist
-    global rgx_06_YT_video_from_playlist_at_current_time
-    global rgx_07_YT_watch_video_from_playlist
-    global rgx_08_YT_short
-    global rgx_09_YT_short_with_share
-    global rgx_10_YT_short_with_current_time
-    global rgx_11_YT_short_with_current_time_and_with_share
-    global full_youtube_regex
     print(f"{sys.argv[0]} will match the provided URL against the following REGEX-s:")
-    print(f"\t-> '{rgx_01_YT_video}'")
-    print(f"\t-> '{rgx_02_YT_video_at_current_time}'")
-    print(f"\t-> '{rgx_03_YT_watch_video}'")
-    print(f"\t-> '{rgx_04_YT_watch_video_at_current_time}'")
-    print(f"\t-> '{rgx_05_YT_video_from_playlist}'")
-    print(f"\t-> '{rgx_06_YT_video_from_playlist_at_current_time}'")
-    print(f"\t-> '{rgx_07_YT_watch_video_from_playlist}'")
-    print(f"\t-> '{rgx_08_YT_short}'")
-    print(f"\t-> '{rgx_09_YT_short_with_share}'")
-    print(f"\t-> '{rgx_10_YT_short_with_current_time}'")
-    print(f"\t-> '{rgx_11_YT_short_with_current_time_and_with_share}'")
-    print(f"\t-> '{full_youtube_regex}'")
+    url_rgx_set = REGEXs_for_YouTube_URL()
+    print(f"\t-> '{url_rgx_set.rgx_01_YT_video}'")
+    print(f"\t-> '{url_rgx_set.rgx_02_YT_video_at_current_time}'")
+    print(f"\t-> '{url_rgx_set.rgx_03_YT_watch_video}'")
+    print(f"\t-> '{url_rgx_set.rgx_04_YT_watch_video_at_current_time}'")
+    print(f"\t-> '{url_rgx_set.rgx_05_YT_video_from_playlist}'")
+    print(f"\t-> '{url_rgx_set.rgx_06_YT_video_from_playlist_at_current_time}'")
+    print(f"\t-> '{url_rgx_set.rgx_07_YT_watch_video_from_playlist}'")
+    print(f"\t-> '{url_rgx_set.rgx_08_YT_short}'")
+    print(f"\t-> '{url_rgx_set.rgx_09_YT_short_with_share}'")
+    print(f"\t-> '{url_rgx_set.rgx_10_YT_short_with_current_time}'")
+    print(f"\t-> '{url_rgx_set.rgx_11_YT_short_with_current_time_and_with_share}'")
+    print(f"\t-> '{url_rgx_set.full_youtube_regex}'")
     print()
     print(f"\tIf none of them matches the provided URL, the program will exit forcefully, with an ERROR message.")
     print()
@@ -948,19 +950,13 @@ def display_used_REGEXs():
     print()
 
     # REGEXs that validate YouTube clip duration
-    global rgx_match_minutes
-    global rgx_match_hours
-    global rgx_match_days_1
-    global rgx_match_days_2
-    global rgx_match_years_1
-    global rgx_match_years_2
     print(f"{sys.argv[0]} will match the provided DURATION (of YouTube clip) against the following REGEX-s:")
-    print(f"\t-> '{rgx_match_minutes}'")
-    print(f"\t-> '{rgx_match_hours}'")
-    print(f"\t-> '{rgx_match_days_1}'")
-    print(f"\t-> '{rgx_match_days_2}'")
-    print(f"\t-> '{rgx_match_years_1}'")
-    print(f"\t-> '{rgx_match_years_2}'")
+    duration_rgx_set = REGEXs_for_duration()
+    print(f"\t-> '{duration_rgx_set.rgx_match_seconds}'")  # [0-59]
+    print(f"\t-> '{duration_rgx_set.rgx_match_minutes}'")  # [0-59]  : [0-59]
+    print(f"\t-> '{duration_rgx_set.rgx_match_seconds}'")  # [0-23]  : [0-59]  : [0-59]
+    print(f"\t-> '{duration_rgx_set.rgx_match_days}'")     # [0-INF] : [0-23]  : [0-59] : [0-59]
+    print(f"\t-> '{duration_rgx_set.rgx_match_years}'")    # [0-INF] : [0-364] : [0-23] : [0-59] : [0-59]
     print()
     print(f"\tIf none of them matches the text of input DURATION (of the YouTube clip), the program will exit forcefully, with an ERROR message.")
     print()

@@ -122,6 +122,17 @@ The script also uses the `re` module for REGEX and `request` for checking online
 so make sure you have it installed.
 
 
+
+```bash
+$ pip3 install requests  # for HTTP request
+$ pip3 install pytube    # getting YouTube clip info
+```
+
+> The `typing` and `re` (REGEX) modules
+> are already part of Python's standard library.
+
+
+
 # Installation
 
 Please see [install.sh](install.sh).
